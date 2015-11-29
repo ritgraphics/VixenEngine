@@ -42,6 +42,8 @@ namespace Vixen {
         void VBind();
         void VUnbind();
 
+        ID3D11Buffer* Buffer();
+
     private:
         ID3D11Device*           m_device;
         ID3D11DeviceContext*    m_context;

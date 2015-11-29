@@ -30,6 +30,8 @@ namespace Vixen {
 
 		static void			RenderDeferred();
 
+        static void         BeginForward();
+
         static IRenderer*   Handle();
 
 		static ICamera2D*   Camera2D();

@@ -78,6 +78,13 @@ namespace Vixen {
 		_renderer.m_renderer->VBeginDeferred();
 	}
 
+    void Renderer::BeginForward()
+    {
+        Renderer& _renderer = Renderer::instance();
+
+        _renderer.m_renderer->VBeginForward();
+    }
+
     void Renderer::ResizeBuffers(uint32_t width, uint32_t height)
     {
         Renderer& _renderer = Renderer::instance();

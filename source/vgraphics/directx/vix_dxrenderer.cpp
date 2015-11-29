@@ -381,10 +381,14 @@ namespace Vixen {
 		m_DefferedBuffers->BindRenderTargets(m_ImmediateContext);
 	}
 
+    void DXRenderer::VBeginForward()
+    {
+        m_ImmediateContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencView);
+    }
+
 	void DXRenderer::VRenderBackBuffer()
 	{
-        //m_DefferedBuffers->UnbindRenderTargets(m_ImmediateContext);
-		m_ImmediateContext->OMSetRenderTargets(1, &m_RenderTargetView, m_DepthStencView);
+        VBeginForward();
 
 		m_FinalPassPS->VSetSamplerState("samLinear", m_FinalPassSS);
         m_FinalPassPS->VSetShaderResourceView("txDiffuse", m_DefferedBuffers->GetShaderResourceView(0));
@@ -496,6 +500,11 @@ namespace Vixen {
 
 		
 	}
+
+    HWND DXRenderer::NativeHandle()
+    {
+        return m_HWND;
+    }
 
 	DXSpriteBatcher* DXRenderer::SpriteBatch()
 	{

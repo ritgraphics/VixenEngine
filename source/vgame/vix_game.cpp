@@ -27,6 +27,7 @@
 #include <vix_pathmanager.h>
 #include <vix_window_singleton.h>
 #include <vix_renderer_singleton.h>
+#include <vix_dbgrenderer_singleton.h>
 #include <vix_objectmanager.h>
 #include <vix_scenemanager.h>
 #include <vix_luaengine.h>
@@ -51,6 +52,8 @@ namespace Vixen {
 
         if (!Renderer::Initialize(Window::Handle()))
             return -1;
+        if (!DebugRenderer::Initialize(Renderer::Handle()))
+            return -1;
 
         Input::SetMouseState(Window::Mouse());
         Input::SetKeyboardState(Window::Keyboard());
@@ -60,6 +63,8 @@ namespace Vixen {
         Curl::Initialize();
         
         Renderer::InitializeSpriteBatch();
+        DebugRenderer::SetCamera(Renderer::Camera2D());
+        DebugRenderer::InitializeShaders();
         ObjectManager::Initialize();
         LuaEngine::Initialize();
         LuaScriptManager::Initialize();
@@ -77,16 +82,22 @@ namespace Vixen {
 
             Window::PollInput();
 
+            DebugRenderer::FrameUpdate();
+
             Renderer::ClearBuffer(ClearArgs::COLOR_DEPTH_STENCIL_BUFFER);
 
 			BulletSimulator::Step(Time::DeltaTime());
 
-            SceneManager::UpdateScenes();
+            //SceneManager::UpdateScenes();
 
-            SceneManager::RenderScenes();
+            //SceneManager::RenderScenes();
+
+            Renderer::BeginForward();
+
+            DebugRenderer::Render();
 
             Renderer::SwapBuffers();
-
+            
             Window::SwapBuffers();
 
             Window::PollInputNextFrame();
@@ -103,6 +114,7 @@ namespace Vixen {
         ObjectManager::DeInitialize();
         
         ResourceManager::DeInitialize();
+        DebugRenderer::DeInitialize();
         Renderer::DeInitialize();
 		ResourceManager::PrintLoaded();
         Curl::DeInitialize();

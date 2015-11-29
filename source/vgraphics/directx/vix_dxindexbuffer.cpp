@@ -85,4 +85,9 @@ namespace Vixen {
         m_context->IASetIndexBuffer(NULL, DXGI_FORMAT_R16_UINT, 0);
     }
 
+    ID3D11Buffer* DXIndexBuffer::Buffer()
+    {
+        return m_buffer;
+    }
+
 }

@@ -68,13 +68,18 @@ namespace Vixen {
 
 		void	VBeginDeferred() override;
 
+        void    VBeginForward() override;
+
 		ICamera2D* VCamera2D();
 
         ID3D11Device* Device();
 
+        HWND  NativeHandle();
+
         ID3D11DeviceContext* DeviceContext();
 
         DXSpriteBatcher* SpriteBatch();
+
 
     private:
         bool CreateBuffers(uint32_t width, uint32_t height);

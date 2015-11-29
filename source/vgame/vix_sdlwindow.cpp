@@ -25,6 +25,7 @@
 #include <vix_sdlwindow.h>
 #include <vix_debugutil.h>
 #include <vix_renderer_singleton.h>
+#include <vix_dbgrenderer_singleton.h>
 #include <vix_scenemanager.h>
 
 namespace Vixen {
@@ -235,6 +236,8 @@ namespace Vixen {
                     {
                         //HANDLE WINDOW RESIZE
                         Renderer::ResizeBuffers(event.window.data1, event.window.data2);
+
+                        DebugRenderer::ResizeBuffers(event.window.data1, event.window.data2);
 
                         SceneManager::UpdateCameraViewports(event.window.data1, event.window.data2);
                         

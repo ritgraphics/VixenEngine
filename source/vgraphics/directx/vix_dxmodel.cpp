@@ -24,6 +24,7 @@
 #include <vix_dxmodel.h>
 #include <vix_assimp.h>
 #include <vix_dxvertexshader.h>
+#include <vix_dxgeometryshader.h>
 #include <vix_dxpixelshader.h>
 #include <vix_tinyxml.h>
 #include <vix_pathmanager.h>

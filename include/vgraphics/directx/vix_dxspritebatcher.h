@@ -32,6 +32,7 @@
 #include <vix_dxvertexbuffer.h>
 #include <vix_dxindexbuffer.h>
 #include <vix_dxvertexshader.h>
+#include <vix_dxgeometryshader.h>
 #include <vix_dxpixelshader.h>
 #include <vix_dxcamera2d.h>
 

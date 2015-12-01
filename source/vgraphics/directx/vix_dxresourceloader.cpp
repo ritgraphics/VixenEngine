@@ -25,6 +25,7 @@
 #include <vix_dxrenderer.h>
 #include <vix_dxshader.h>
 #include <vix_dxvertexshader.h>
+#include <vix_dxgeometryshader.h>
 #include <vix_dxpixelshader.h>
 #include <vix_dxmodel.h>
 #include <vix_bmfont.h>
@@ -58,9 +59,12 @@ namespace Vixen {
         if (type == ShaderType::VERTEX_SHADER)
             _shader = new DXVertexShader(m_renderer->Device(),
                 m_renderer->DeviceContext());
-        else if (type == ShaderType::PIXEL_SHADER)
-            _shader = new DXPixelShader(m_renderer->Device(),
-                m_renderer->DeviceContext());
+		else if (type == ShaderType::PIXEL_SHADER)
+			_shader = new DXPixelShader(m_renderer->Device(),
+				m_renderer->DeviceContext());
+		else if (type == ShaderType::GEOMETRY_SHADER)
+			_shader = new DXGeometryShader(m_renderer->Device(), 
+				m_renderer->DeviceContext());
 
         if (_shader->VInitFromFile(file))
             return _shader;

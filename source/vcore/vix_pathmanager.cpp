@@ -36,6 +36,7 @@ namespace Vixen
     UString PathManager::_ShaderPath = VTEXT("");
     UString PathManager::_ScriptPath = VTEXT("");
 	UString PathManager::_PrefabPath = VTEXT("");
+	UString PathManager::_EmitterPath = VTEXT("");
 
     PathManager::~PathManager()
     {
@@ -86,6 +87,9 @@ namespace Vixen
 		_PrefabPath = _AssetPath + VTEXT("Prefabs/");
 		_PrefabPath = os_path(_PrefabPath);
 
+		_EmitterPath = _AssetPath + VTEXT("Emitters/");
+		_EmitterPath = os_path(_EmitterPath);
+
         FileManager::CloseFile(envFile);
     }
 
@@ -127,5 +131,10 @@ namespace Vixen
 	UString PathManager::PrefabPath()
 	{
 		return _PrefabPath;
+	}
+
+	UString PathManager::EmitterPath()
+	{
+		return _EmitterPath;
 	}
 }

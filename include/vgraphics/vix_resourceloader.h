@@ -31,6 +31,7 @@
 #include <vix_model.h>
 #include <vix_material.h>
 #include <vix_font.h>
+#include <vix_particleemitter.h>
 
 namespace Vixen {
 
@@ -39,13 +40,12 @@ namespace Vixen {
     public:
         virtual ~IResourceLoader() { }
 
-        virtual Texture*   LoadTexture(File* file) = 0;
-        virtual Shader*    LoadShader(File* file, ShaderType type) = 0;
-        virtual Model*     LoadModel(File* file) = 0;
-        virtual Font*      LoadFont(File* file) = 0;
-		virtual Material*  LoadMaterial(File* file) = 0;
-      
-
+        virtual Texture*	LoadTexture(File* file) = 0;
+        virtual Shader*		LoadShader(File* file, ShaderType type) = 0;
+        virtual Model*		LoadModel(File* file) = 0;
+        virtual Font*		LoadFont(File* file) = 0;
+		virtual Material*	LoadMaterial(File* file) = 0;
+		virtual Emitter*	LoadEmitter(File* file) = 0;
     };
 
 }

@@ -49,7 +49,8 @@ namespace Vixen {
         Model,
         Font,
         Shader,
-		Material
+		Material,
+		Emitter
     };
 
     /**
@@ -68,11 +69,12 @@ namespace Vixen {
         static void DeInitialize();
 
         static void         AttachResourceLoader(IResourceLoader* loader);
-        static Texture*    OpenTexture(UString filePath);
-        static Shader*     OpenShader(UString filePath, ShaderType type);
-        static Model*      OpenModel(UString filePath);
-        static Font*       OpenFont(UString filePath);
-        static Material*   OpenMaterial(UString filePath);
+        static Texture*		OpenTexture(UString filePath);
+        static Shader*		OpenShader(UString filePath, ShaderType type);
+        static Model*		OpenModel(UString filePath);
+        static Font*		OpenFont(UString filePath);
+        static Material*	OpenMaterial(UString filePath);
+		static Emitter*		OpenEmitter(UString filePath);
 
 		static Asset*		AccessAsset(UString assetName);
 		static void			MapAsset(UString assetName, Asset* asset);

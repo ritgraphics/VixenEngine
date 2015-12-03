@@ -44,6 +44,7 @@ namespace Vixen
         static UString ShaderPath();
         static UString ScriptPath();
 		static UString PrefabPath();
+		static UString EmitterPath();
 
     private:
         static UString _AssetPath;
@@ -53,6 +54,7 @@ namespace Vixen
         static UString _ShaderPath;
         static UString _ScriptPath;
 		static UString _PrefabPath;
+		static UString _EmitterPath;
     };
 }
 

@@ -28,6 +28,7 @@
 #include <vix_dxgeometryshader.h>
 #include <vix_dxpixelshader.h>
 #include <vix_dxmodel.h>
+#include <vix_dxparticleemitter.h>
 #include <vix_bmfont.h>
 #include <vix_filemanager.h>
 
@@ -96,6 +97,16 @@ namespace Vixen {
 
 		if (_material->VInitFromFile(file))
 			return _material;
+
+		return NULL;
+	}
+
+	Emitter* DXResourceLoader::LoadEmitter(File* file)
+	{
+		DXEmitter* _emitter = new DXEmitter(m_renderer->Device(), m_renderer->DeviceContext());
+
+		if (_emitter->VInitFromFile(file))
+			return _emitter;
 
 		return NULL;
 	}

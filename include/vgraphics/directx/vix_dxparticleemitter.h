@@ -24,6 +24,7 @@ SOFTWARE.
 #ifndef VIX_DXPARTICLEEMITTER_H
 #define VIX_DXPARTICLEEMITTER_H
 
+#include <vix_platform.h>
 #include <vix_directx.h>
 #include <vix_dxspritebatcher.h>
 #include <vix_dxcamera3d.h>
@@ -32,19 +33,14 @@ SOFTWARE.
 
 namespace Vixen {
 
-	class VIX_API DXParticleEmitter : IParticleEmitter {
+	class VIX_API DXEmitter : public Emitter {
 	public:
-		DXParticleEmitter(float ageToSpawn, float maxLifetime, Vector3 constAccel, ParticleSettings settings);
-		~DXParticleEmitter();
-		bool Init(ID3D11Device* device, 
-			ID3D11DeviceContext* context, 
-			UString spawnVS, 
-			UString spawnGS, 
-			UString particleVS, 
-			UString particleGS, 
-			UString particlePS);
-		void VRenderSpawn(float dt, float totalTime);
-		void VRender(float dt, float totalTime, ICamera3D* camera);
+		DXEmitter(ID3D11Device* device, ID3D11DeviceContext* context);
+		~DXEmitter();
+		bool Init();
+		bool VInitFromFile(File* file)                  override;
+		void VRenderSpawn(float dt, float totalTime) override;
+		void VRender(float dt, float totalTime, ICamera3D* camera) override;
 
 
 	private:
@@ -60,9 +56,10 @@ namespace Vixen {
 		DXGeometryShader*					m_spawnGS;
 		ID3D11Texture1D*					m_randomTexture;
 		ID3D11ShaderResourceView*			m_randomSRV;
-		ID3D11ShaderResourceView*			m_particleTexture;
+		Texture*							m_particleTexture;
 		ID3D11BlendState*					m_particleBlendState;
 		ID3D11DepthStencilState*			m_particleDepthState;
+		ID3D11SamplerState*					m_sampler;
 
 		bool								m_initialized;
 		bool								m_isFirstFrame;

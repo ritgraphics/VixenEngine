@@ -48,7 +48,8 @@ namespace Vixen {
 			SPRITE,
 			MODEL,
 			CAMERA,
-			PHYSICS_RIGIDBODY
+			PHYSICS_RIGIDBODY,
+			EMITTER
 		};
 
 		Component(Type type)

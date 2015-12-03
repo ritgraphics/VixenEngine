@@ -27,7 +27,8 @@ SOFTWARE.
 #include <vix_platform.h>
 #include <vix_vector3.h>
 #include <vix_color.h>
-#include <vix_resourcemanager.h>
+#include <vix_asset.h>
+#include <vix_camera3d.h>
 
 namespace Vixen {
 
@@ -43,11 +44,13 @@ namespace Vixen {
 		Vector3 startMidEndSize;
 	};
 
-	class VIX_API IParticleEmitter
+	class VIX_API Emitter : public Asset
 	{
 	public:
-		IParticleEmitter(float ageToSpawn, float maxLifetime, Vector3 constAccel, ParticleSettings settings);
-		~IParticleEmitter();
+		Emitter();
+		~Emitter();
+		virtual void VRenderSpawn(float dt, float totalTime) = 0;
+		virtual void VRender(float dt, float totalTime, ICamera3D* camera) = 0;
 	protected:
 		float								m_ageToSpawn;
 		float								m_maxLifetime;

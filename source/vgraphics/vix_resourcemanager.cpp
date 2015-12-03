@@ -235,6 +235,41 @@ namespace Vixen {
 		return _material;
 	}
 
+	Emitter* ResourceManager::OpenEmitter(UString filePath)
+	{
+		UString assetPath = PathManager::EmitterPath();
+
+		assetPath += filePath;
+		assetPath = os_path(assetPath);
+
+		Emitter* _emitter = NULL;
+
+		File* file = FileManager::OpenFile(assetPath, FileMode::ReadBinary);
+		if (file)
+		{
+			//Create Renderer Specific model type
+			ResourceManager& _RM = ResourceManager::instance();
+
+			if (_RM.m_resourceLoader)
+			{
+				_emitter = (Emitter*)ResourceManager::AccessAsset(file->FileName());
+
+				if (!_emitter)
+				{
+					//Need to load a material object into memory
+					_emitter = _RM.m_resourceLoader->LoadEmitter(file);
+
+
+					ResourceManager::MapAsset(file->FileName(), _emitter);
+				}
+
+				FileManager::CloseFile(file);
+			}
+		}
+
+		return _emitter;
+	}
+
 	Asset* ResourceManager::AccessAsset(UString assetName)
 	{
 		ResourceManager& _RM = ResourceManager::instance();

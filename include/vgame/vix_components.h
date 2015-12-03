@@ -29,6 +29,7 @@ SOFTWARE.
 #include <vix_camera3Dcomponent.h>
 #include <vix_modelcomponent.h>
 #include <vix_rigidbody_component.h>
+#include <vix_emittercomponent.h>
 #include <vix_luascript.h>
 #include <vix_uitext.h>
 

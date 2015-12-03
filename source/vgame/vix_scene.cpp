@@ -368,6 +368,11 @@ namespace Vixen {
 				//PARSE RIGIDBODY COMPONENT
 				component = ParseRigidBodyComponent(child);
 			}
+			else if (name == "emitter")
+			{
+				//PARSE EMITTER
+				component = ParseEmitterComponent(child);
+			}
 
 			components.push_back(component);
 			child = child->NextSiblingElement();
@@ -580,5 +585,23 @@ namespace Vixen {
 		_component->SetRestitution(restitution);
 
 		return _component;
+	}
+
+	Component* Scene::ParseEmitterComponent(const tinyxml2::XMLElement* element)
+	{
+		using namespace tinyxml2;
+
+		const char* file = element->Attribute("file");
+
+		Emitter* _emitter = ResourceManager::OpenEmitter(UStringFromCharArray(file));
+		if (!_emitter) {
+			DebugPrintF(VTEXT("Failed to open emitter.\n"));
+			return NULL;
+		}
+
+		EmitterComponent* _emitterComponent = new EmitterComponent;
+		_emitterComponent->SetEmitter(_emitter);
+		
+		return _emitterComponent;
 	}
 }

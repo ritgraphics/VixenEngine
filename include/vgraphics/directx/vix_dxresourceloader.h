@@ -43,6 +43,7 @@ namespace Vixen {
         Model*     LoadModel(File* file)                   override;
         Font*      LoadFont(File* file)                    override;
 		Material*  LoadMaterial(File* file)				override;
+		Emitter*	LoadEmitter(File* file)				override;
        
     private:
         DXRenderer* m_renderer;

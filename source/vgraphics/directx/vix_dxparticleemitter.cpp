@@ -58,7 +58,17 @@ namespace Vixen {
 		srvDesc.Texture1D.MipLevels = 1;
 		srvDesc.Texture1D.MostDetailedMip = 0;
 		m_device->CreateShaderResourceView(m_randomTexture, &srvDesc, &m_randomSRV);
-		
+
+		// Create the sampler
+		D3D11_SAMPLER_DESC samplerDesc;
+		ZeroMemory(&samplerDesc, sizeof(samplerDesc));
+		samplerDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		samplerDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		samplerDesc.MaxLOD = D3D11_FLOAT32_MAX;
+		m_device->CreateSamplerState(&samplerDesc, &m_sampler);
+
 		m_spawnGS->CreateCompatibleStreamOutBuffer(&m_soBufferRead, 1000000);
 		m_spawnGS->CreateCompatibleStreamOutBuffer(&m_soBufferWrite, 1000000);
 		
@@ -203,7 +213,7 @@ namespace Vixen {
 		return Init();
 	}
 
-	void DXEmitter::VRenderSpawn(float dt, float totalTime) 
+	void DXEmitter::VRenderSpawn(float dt, float totalTime)
 	{
 		if (!m_initialized)
 			return;
@@ -253,7 +263,7 @@ namespace Vixen {
 		m_soBufferWrite = temp;
 	}
 
-	void DXEmitter::VRender(float dt, float totalTime, ICamera3D* camera)
+	void DXEmitter::VRender(ICamera3D* camera)
 	{
 		if (!m_initialized)
 			return;

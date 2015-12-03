@@ -27,9 +27,8 @@ SOFTWARE.
 #include <vix_platform.h>
 #include <vix_directx.h>
 #include <vix_dxspritebatcher.h>
-#include <vix_dxcamera3d.h>
 #include <vix_particleemitter.h>
-
+#include <vix_dxcamera3d.h>
 
 namespace Vixen {
 
@@ -40,7 +39,7 @@ namespace Vixen {
 		bool Init();
 		bool VInitFromFile(File* file)                  override;
 		void VRenderSpawn(float dt, float totalTime) override;
-		void VRender(float dt, float totalTime, ICamera3D* camera) override;
+		void VRender(ICamera3D* camera) override;
 
 
 	private:

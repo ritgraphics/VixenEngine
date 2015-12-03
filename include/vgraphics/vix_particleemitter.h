@@ -50,7 +50,7 @@ namespace Vixen {
 		Emitter();
 		~Emitter();
 		virtual void VRenderSpawn(float dt, float totalTime) = 0;
-		virtual void VRender(float dt, float totalTime, ICamera3D* camera) = 0;
+		virtual void VRender(ICamera3D* camera) = 0;
 	protected:
 		float								m_ageToSpawn;
 		float								m_maxLifetime;

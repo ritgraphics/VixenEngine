@@ -39,7 +39,7 @@ namespace Vixen {
 	{
 		if (m_emitter) {
 			m_emitter->VRenderSpawn(Time::DeltaTime(), Time::TotalTime());
-			m_emitter->VRender(Time::DeltaTime(), Time::TotalTime(), camera);
+			m_emitter->VRender(camera);
 		}
 	}
 

@@ -16,27 +16,18 @@ namespace Vixen {
 	public:
 		EmitterComponent();
 
-		void VOnInit();
-
-		void VOnEnable();
-
-		void VUpdate();
-
-		void VOnDisable();
-
-		void VOnDestroy();
-
-		void VBindParent(GameObject* parent);
-
-		void VRender(ICamera3D* camera);
-		
+		void				VOnInit();
+		void				VOnEnable();
+		void				VUpdate();
+		void				VOnDisable();
+		void				VOnDestroy();
+		void				VBindParent(GameObject* parent);
+		void				VRender(ICamera3D* camera);
 		Emitter*			GetEmitter();
-
-		void						SetEmitter(Emitter * emitter);
-
+		void				SetEmitter(Emitter * emitter);
 	private:
 		Emitter*			m_emitter;
-		GameObject*					m_parent;
+		GameObject*			m_parent;
 	};
 
 }

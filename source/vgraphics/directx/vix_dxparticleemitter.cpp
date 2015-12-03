@@ -110,6 +110,29 @@ namespace Vixen {
 			return Vector3(_x, _y, _z);
 		};
 
+		auto ColorForElement = [](XMLElement* element) -> Color {
+			if (!element)
+				return Colors::Black;
+			const char * _name = element->Attribute("name");
+			float _r = -1.0f; 
+			element->QueryFloatAttribute("r", &_r);
+			float _g = -1.0f; 
+			element->QueryFloatAttribute("g", &_g);
+			float _b = -1.0f; 
+			element->QueryFloatAttribute("b", &_b);
+			float _a = 1.0f; 
+			element->QueryFloatAttribute("a", &_a);
+			if (_name) {
+				return Color::FromUString(UStringFromCharArray(_name));
+			}
+			else if (_r != -1.0f && _g != -1.0f && _b != -1.0f) {
+				return Color(_r, _g, _b, _a);
+			}
+			else {
+				return Colors::Black;
+			}
+		};
+
 		XMLDOC document;
 		XMLError err = document.LoadFile(file->Handle());
 		UString errString;
@@ -139,7 +162,9 @@ namespace Vixen {
 			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing colors"), file->BaseName().c_str());
 			return false;
 		}
-		
+		Color _startColor = ColorForElement(colorsElement->FirstChildElement("start-color"));
+		Color _midColor = ColorForElement(colorsElement->FirstChildElement("mid-color"));
+		Color _endColor = ColorForElement(colorsElement->FirstChildElement("end-color"));
 
 		XMLElement* spawnVSElement = emtElement->FirstChildElement("vertex-shader");
 		if (!spawnVSElement) {
@@ -194,6 +219,9 @@ namespace Vixen {
 		//Set properties
 		m_settings.type = _type;
 		m_settings.age = _age;
+		m_settings.startColor = _startColor;
+		m_settings.midColor = _midColor;
+		m_settings.endColor = _endColor;
 		m_settings.startPosition = _startPosition;
 		m_settings.startVelocity = _startVelocity;
 		m_settings.startMidEndSize = _startMidEndSize;

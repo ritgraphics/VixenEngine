@@ -1,6 +1,5 @@
 #include "vix_dxparticleemitter.h"
 #include "vix_dxtexture.h"
-#include "vix_resourcemanager.h"
 
 namespace Vixen {
 	DXEmitter::DXEmitter(ID3D11Device* device, ID3D11DeviceContext* context)
@@ -101,38 +100,6 @@ namespace Vixen {
 
 		using namespace tinyxml2;
 
-		auto VectorForElement = [](XMLElement* element) -> Vector3 {
-			if (!element)
-				return Vector3::Zero;
-			float _x = element->FloatAttribute("x");
-			float _y = element->FloatAttribute("y");
-			float _z = element->FloatAttribute("z");
-			return Vector3(_x, _y, _z);
-		};
-
-		auto ColorForElement = [](XMLElement* element) -> Color {
-			if (!element)
-				return Colors::Black;
-			const char * _name = element->Attribute("name");
-			float _r = -1.0f; 
-			element->QueryFloatAttribute("r", &_r);
-			float _g = -1.0f; 
-			element->QueryFloatAttribute("g", &_g);
-			float _b = -1.0f; 
-			element->QueryFloatAttribute("b", &_b);
-			float _a = 1.0f; 
-			element->QueryFloatAttribute("a", &_a);
-			if (_name) {
-				return Color::FromUString(UStringFromCharArray(_name));
-			}
-			else if (_r != -1.0f && _g != -1.0f && _b != -1.0f) {
-				return Color(_r, _g, _b, _a);
-			}
-			else {
-				return Colors::Black;
-			}
-		};
-
 		XMLDOC document;
 		XMLError err = document.LoadFile(file->Handle());
 		UString errString;
@@ -148,97 +115,118 @@ namespace Vixen {
 			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing settings"), file->BaseName().c_str());
 			return false;
 		}
-		int _type = settingsElement->IntAttribute("type");
-		float _age = settingsElement->FloatAttribute("age");
-		float _ageToSpawn = settingsElement->FloatAttribute("ageToSpawn");
-		float _maxLifetime = settingsElement->FloatAttribute("maxLifetime");
-		Vector3 _startPosition = VectorForElement(settingsElement->FirstChildElement("startPosition"));
-		Vector3 _startVelocity = VectorForElement(settingsElement->FirstChildElement("startVelocity"));
-		Vector3 _startMidEndSize = VectorForElement(settingsElement->FirstChildElement("startMidEndSize"));
-		Vector3 _constantAcceleration = VectorForElement(settingsElement->FirstChildElement("constantAcceleration"));
+		int type = settingsElement->IntAttribute("type");
+		float age = settingsElement->FloatAttribute("age");
+		float ageToSpawn = settingsElement->FloatAttribute("ageToSpawn");
+		float maxLifetime = settingsElement->FloatAttribute("maxLifetime");
+		Vector3 startPosition = VectorForXmlElement(settingsElement->FirstChildElement("startPosition"));
+		Vector3 startVelocity = VectorForXmlElement(settingsElement->FirstChildElement("startVelocity"));
+		Vector3 startMidEndSize = VectorForXmlElement(settingsElement->FirstChildElement("startMidEndSize"));
+		Vector3 constantAcceleration = VectorForXmlElement(settingsElement->FirstChildElement("constantAcceleration"));
 
 		XMLElement* colorsElement = settingsElement->FirstChildElement("colors");
 		if (!colorsElement) {
 			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing colors"), file->BaseName().c_str());
 			return false;
 		}
-		Color _startColor = ColorForElement(colorsElement->FirstChildElement("start-color"));
-		Color _midColor = ColorForElement(colorsElement->FirstChildElement("mid-color"));
-		Color _endColor = ColorForElement(colorsElement->FirstChildElement("end-color"));
+		Color startColor = ColorForXmlElement(colorsElement->FirstChildElement("start-color"));
+		Color midColor = ColorForXmlElement(colorsElement->FirstChildElement("mid-color"));
+		Color endColor = ColorForXmlElement(colorsElement->FirstChildElement("end-color"));
 
-		XMLElement* spawnVSElement = emtElement->FirstChildElement("vertex-shader");
-		if (!spawnVSElement) {
-			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing spawn vertex shader"), file->BaseName().c_str());
-			return false;
-		}
-		UString _spawnVSPath = UStringFromCharArray(spawnVSElement->Attribute("val"));
-
-		XMLElement* spawnGSElement = emtElement->FirstChildElement("geometry-shader");
-		if (!spawnGSElement) {
-			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing spawn geometry shader"), file->BaseName().c_str());
-			return false;
-		}
-		UString _spawnGSPath = UStringFromCharArray(spawnGSElement->Attribute("val"));
-
+		UString spawnVSPath = ShaderPathFromXmlElement(file, emtElement->FirstChildElement("vertex-shader"));
+		UString spawnGSPath = ShaderPathFromXmlElement(file, emtElement->FirstChildElement("geometry-shader"));
 
 		XMLElement* particleElement = emtElement->FirstChildElement("particle");
 		if (!particleElement) {
 			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing particle"), file->BaseName().c_str());
 			return false;
 		}
-
 		XMLElement* textureElement = particleElement->FirstChildElement("texture");
 		if (!textureElement) {
 			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing particle texture"), file->BaseName().c_str());
 			return false;
 		}
-		UString _particleTexturePath = UStringFromCharArray(textureElement->Attribute("file"));
-
-		XMLElement* particleVSElement = particleElement->FirstChildElement("vertex-shader");
-		if (!particleVSElement) {
-			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing particle vertex shader"), file->BaseName().c_str());
-			return false;
-		}
-		UString _particleVSPath = UStringFromCharArray(particleVSElement->Attribute("val"));
-
-		XMLElement* particleGSElement = particleElement->FirstChildElement("geometry-shader");
-		if (!particleGSElement) {
-			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing particle geometry shader"), file->BaseName().c_str());
-			return false;
-		}
-		UString _particleGSPath = UStringFromCharArray(particleGSElement->Attribute("val"));
-
-		XMLElement* particlePSElement = particleElement->FirstChildElement("pixel-shader");
-		if (!particlePSElement) {
-			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing particle pixel shader"), file->BaseName().c_str());
-			return false;
-		}
-		UString _particlePSPath = UStringFromCharArray(particlePSElement->Attribute("val"));
-
-
+		UString particleTexturePath = UStringFromCharArray(textureElement->Attribute("file"));
+		UString particleVSPath = ShaderPathFromXmlElement(file, particleElement->FirstChildElement("vertex-shader"));
+		UString particleGSPath = ShaderPathFromXmlElement(file, particleElement->FirstChildElement("geometry-shader"));
+		UString particlePSPath = ShaderPathFromXmlElement(file, particleElement->FirstChildElement("pixel-shader"));
+		
 		//Set properties
-		m_settings.type = _type;
-		m_settings.age = _age;
-		m_settings.startColor = _startColor;
-		m_settings.midColor = _midColor;
-		m_settings.endColor = _endColor;
-		m_settings.startPosition = _startPosition;
-		m_settings.startVelocity = _startVelocity;
-		m_settings.startMidEndSize = _startMidEndSize;
+		m_settings.type = type;
+		m_settings.age = age;
+		m_settings.startColor = startColor;
+		m_settings.midColor = midColor;
+		m_settings.endColor = endColor;
+		m_settings.startPosition = startPosition;
+		m_settings.startVelocity = startVelocity;
+		m_settings.startMidEndSize = startMidEndSize;
 
-		m_ageToSpawn = _ageToSpawn;
-		m_maxLifetime = _maxLifetime;
-		m_constAccel = _constantAcceleration;
+		m_ageToSpawn = ageToSpawn;
+		m_maxLifetime = maxLifetime;
+		m_constAccel = constantAcceleration;
 
-		m_spawnVS = (DXVertexShader*)ResourceManager::OpenShader(_spawnVSPath, ShaderType::VERTEX_SHADER);
-		m_spawnGS = (DXGeometryShader*)ResourceManager::OpenShader(_spawnGSPath, ShaderType::GEOMETRY_SHADER);
-		m_particleVS = (DXVertexShader*)ResourceManager::OpenShader(_particleVSPath, ShaderType::VERTEX_SHADER);
-		m_particleGS = (DXGeometryShader*)ResourceManager::OpenShader(_particleGSPath, ShaderType::GEOMETRY_SHADER);
-		m_particlePS = (DXPixelShader*)ResourceManager::OpenShader(_particlePSPath, ShaderType::PIXEL_SHADER);
+		if (!LoadShaders(spawnVSPath, spawnGSPath, particleVSPath, particleGSPath, particlePSPath)) {
+			DebugPrintF(VTEXT("Vixen Emitter File: %s, invalid shaders"), file->BaseName().c_str());
+			return false;
+		}
 
-		m_particleTexture = ResourceManager::OpenTexture(_particleTexturePath);
+		m_particleTexture = ResourceManager::OpenTexture(particleTexturePath);
 
 		return Init();
+	}
+
+	Vector3 DXEmitter::VectorForXmlElement(tinyxml2::XMLElement* element)
+	{
+		if (!element)
+			return Vector3::Zero;
+		float _x = element->FloatAttribute("x");
+		float _y = element->FloatAttribute("y");
+		float _z = element->FloatAttribute("z");
+		return Vector3(_x, _y, _z);
+	}
+
+	Color DXEmitter::ColorForXmlElement(tinyxml2::XMLElement* element)
+	{
+		if (!element)
+			return Colors::Black;
+
+		const char * _name = element->Attribute("name");
+		if (_name) {
+			return Colors::ColorFromUString(UStringFromCharArray(_name));
+		}
+
+		float _r = -1.0f;
+		element->QueryFloatAttribute("r", &_r);
+		float _g = -1.0f;
+		element->QueryFloatAttribute("g", &_g);
+		float _b = -1.0f;
+		element->QueryFloatAttribute("b", &_b);
+		float _a = 1.0f;
+		element->QueryFloatAttribute("a", &_a);
+		if (_r != -1.0f && _g != -1.0f && _b != -1.0f) {
+			return Color(_r, _g, _b, _a);
+		}
+
+		return Colors::Black;
+	}
+
+	UString DXEmitter::ShaderPathFromXmlElement(File* file, tinyxml2::XMLElement* element)
+	{
+		if (!element) {
+			DebugPrintF(VTEXT("Vixen Emitter File: %s, missing shader element"), file->BaseName().c_str());
+			return false;
+		}
+		return UStringFromCharArray(element->Attribute("val"));
+	}
+
+	bool DXEmitter::LoadShaders(UString spawnVSPath, UString spawnGSPath, UString particleVSPath, UString particleGSPath, UString particlePSPath)
+	{
+		m_spawnVS = (DXVertexShader*)ResourceManager::OpenShader(spawnVSPath, ShaderType::VERTEX_SHADER);
+		m_spawnGS = (DXGeometryShader*)ResourceManager::OpenShader(spawnGSPath, ShaderType::GEOMETRY_SHADER);
+		m_particleVS = (DXVertexShader*)ResourceManager::OpenShader(particleVSPath, ShaderType::VERTEX_SHADER);
+		m_particleGS = (DXGeometryShader*)ResourceManager::OpenShader(particleGSPath, ShaderType::GEOMETRY_SHADER);
+		m_particlePS = (DXPixelShader*)ResourceManager::OpenShader(particlePSPath, ShaderType::PIXEL_SHADER);
+		return m_spawnVS && m_spawnGS && m_particleVS && m_particleGS && m_particlePS;
 	}
 
 	void DXEmitter::VRenderSpawn(float dt, float totalTime)

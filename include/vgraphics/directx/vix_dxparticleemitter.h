@@ -27,8 +27,9 @@ SOFTWARE.
 #include <vix_platform.h>
 #include <vix_directx.h>
 #include <vix_dxspritebatcher.h>
-#include <vix_particleemitter.h>
 #include <vix_dxcamera3d.h>
+#include <vix_resourcemanager.h>
+#include <vix_particleemitter.h>
 
 namespace Vixen {
 
@@ -40,9 +41,16 @@ namespace Vixen {
 		bool VInitFromFile(File* file)                  override;
 		void VRenderSpawn(float dt, float totalTime) override;
 		void VRender(ICamera3D* camera) override;
-
-
 	private:
+		Vector3 VectorForXmlElement(tinyxml2::XMLElement* element);
+		Color	ColorForXmlElement(tinyxml2::XMLElement* element);
+		UString ShaderPathFromXmlElement(File* file, tinyxml2::XMLElement* element);
+		bool	LoadShaders(UString spawnVSPath, 
+							UString spawnGSPath, 
+							UString particleVSPath, 
+							UString particleGSPath, 
+							UString particlePSPath);
+
 		ID3D11Device*                       m_device;
 		ID3D11DeviceContext*                m_context;
 		ID3D11Buffer*						m_vBuffer;

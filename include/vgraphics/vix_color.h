@@ -24,6 +24,8 @@
 #ifndef VIX_COLOR_H
 #define VIX_COLOR_H
 
+#include <vix_stringutil.h>
+
 namespace Vixen {
 
 	class Color
@@ -54,12 +56,11 @@ namespace Vixen {
 				   (b == other.b) &&
 				   (a == other.a);
 		}
-
-		static const Color FromUString(UString);
 	};
 
 	namespace Colors {
-
+		
+		#pragma region Constants
 		static const Color IndianRed = Color(0.804f, 0.361f, 0.361f, 1.0f); //RGBA: {0.804f, 0.361f, 0.361f, 1.0f}
 		static const Color LightCoral = Color(0.941f, 0.502f, 0.502f, 1.0f);//RGBA: {0.941f, 0.502f, 0.502f, 1.0f}
 		static const Color Salmon = Color(0.980f, 0.502f, 0.447f, 1.0f); //RGBA: {0.980f, 0.502f, 0.447f, 1.0f}
@@ -199,428 +200,425 @@ namespace Vixen {
 		static const Color SlateGray = Color(0.439f, 0.502f, 0.565f, 1.0f); //RGBA: {0.439f, 0.502f, 0.565f, 1.0f}
 		static const Color DarkSlateGray = Color(0.184f, 0.310f, 0.310f, 1.0f); //RGBA: {0.184f, 0.310f, 0.310f, 1.0f}
 		static const Color Black = Color(0.0f, 0.0f, 0.0f, 1.0f); //RGBA: {0.0f, 0.0f, 0.0f, 1.0f}
-	}
+#pragma endregion Constants
 
-	const Color Color::FromUString(UString colorStr)
-	{
-		using namespace Colors;
 
-		if (colorStr == VTEXT("indianred")) {
-			return IndianRed;
-		}
-		else if (colorStr == VTEXT("lightcoral")) {
-			return LightCoral;
-		}
-		else if (colorStr == VTEXT("salmon")) {
-			return Salmon;
-		}
-		else if (colorStr == VTEXT("darksalmon")) {
-			return DarkSalmon;
-		}
-		else if (colorStr == VTEXT("lightsalmon")) {
-			return LightSalmon;
-		}
-		else if (colorStr == VTEXT("crimson")) {
-			return Crimson;
-		}
-		else if (colorStr == VTEXT("red")) {
-			return Red;
-		}
-		else if (colorStr == VTEXT("firebrick")) {
-			return FireBrick;
-		}
-		else if (colorStr == VTEXT("darkred")) {
-			return DarkRed;
-		}
-		else if (colorStr == VTEXT("pink")) {
-			return Pink;
-		}
-		else if (colorStr == VTEXT("lightpink")) {
-			return LightPink;
-		}
-		else if (colorStr == VTEXT("hotpink")) {
-			return HotPink;
-		}
-		else if (colorStr == VTEXT("deeppink")) {
-			return DeepPink;
-		}
-		else if (colorStr == VTEXT("mediumvioletred")) {
-			return MediumVioletRed;
-		}
-		else if (colorStr == VTEXT("palevioletred")) {
-			return PaleVioletRed;
-		}
-		else if (colorStr == VTEXT("coral")) {
-			return Coral;
-		}
-		else if (colorStr == VTEXT("tomato")) {
-			return Tomato;
-		}
-		else if (colorStr == VTEXT("orangered")) {
-			return OrangeRed;
-		}
-		else if (colorStr == VTEXT("darkorange")) {
-			return DarkOrange;
-		}
-		else if (colorStr == VTEXT("orange")) {
-			return Orange;
-		}
-		else if (colorStr == VTEXT("gold")) {
-			return Gold;
-		}
-		else if (colorStr == VTEXT("yellow")) {
-			return Yellow;
-		}
-		else if (colorStr == VTEXT("lightyellow")) {
-			return LightYellow;
-		}
-		else if (colorStr == VTEXT("lemonchion")) {
-			return LemonChion;
-		}
-		else if (colorStr == VTEXT("lightgoldenrodyellow")) {
-			return LightGoldenRodYellow;
-		}
-		else if (colorStr == VTEXT("papayawhip")) {
-			return PapayaWhip;
-		}
-		else if (colorStr == VTEXT("moccasin")) {
-			return Moccasin;
-		}
-		else if (colorStr == VTEXT("peachpu")) {
-			return PeachPu;
-		}
-		else if (colorStr == VTEXT("palegoldenrod")) {
-			return PaleGoldenRod;
-		}
-		else if (colorStr == VTEXT("khaki")) {
-			return Khaki;
-		}
-		else if (colorStr == VTEXT("darkkhaki")) {
-			return DarkKhaki;
-		}
-		else if (colorStr == VTEXT("lavender")) {
-			return Lavender;
-		}
-		else if (colorStr == VTEXT("thistle")) {
-			return Thistle;
-		}
-		else if (colorStr == VTEXT("plum")) {
-			return Plum;
-		}
-		else if (colorStr == VTEXT("violet")) {
-			return Violet;
-		}
-		else if (colorStr == VTEXT("orchid")) {
-			return Orchid;
-		}
-		else if (colorStr == VTEXT("magenta")) {
-			return Magenta;
-		}
-		else if (colorStr == VTEXT("mediumorchid")) {
-			return MediumOrchid;
-		}
-		else if (colorStr == VTEXT("mediumpurple")) {
-			return MediumPurple;
-		}
-		else if (colorStr == VTEXT("blueviolet")) {
-			return BlueViolet;
-		}
-		else if (colorStr == VTEXT("darkviolet")) {
-			return DarkViolet;
-		}
-		else if (colorStr == VTEXT("darkorchid")) {
-			return DarkOrchid;
-		}
-		else if (colorStr == VTEXT("darkmagenta")) {
-			return DarkMagenta;
-		}
-		else if (colorStr == VTEXT("purple")) {
-			return Purple;
-		}
-		else if (colorStr == VTEXT("indigo")) {
-			return Indigo;
-		}
-		else if (colorStr == VTEXT("slateblue")) {
-			return SlateBlue;
-		}
-		else if (colorStr == VTEXT("darkslateblue")) {
-			return DarkSlateBlue;
-		}
-		else if (colorStr == VTEXT("greenyellow")) {
-			return GreenYellow;
-		}
-		else if (colorStr == VTEXT("chartreuse")) {
-			return Chartreuse;
-		}
-		else if (colorStr == VTEXT("lawngreen")) {
-			return LawnGreen;
-		}
-		else if (colorStr == VTEXT("lime")) {
-			return Lime;
-		}
-		else if (colorStr == VTEXT("limegreen")) {
-			return LimeGreen;
-		}
-		else if (colorStr == VTEXT("palegreen")) {
-			return PaleGreen;
-		}
-		else if (colorStr == VTEXT("lightgreen")) {
-			return LightGreen;
-		}
-		else if (colorStr == VTEXT("mediumspringgreen")) {
-			return MediumSpringGreen;
-		}
-		else if (colorStr == VTEXT("springgreen")) {
-			return SpringGreen;
-		}
-		else if (colorStr == VTEXT("seagreen")) {
-			return SeaGreen;
-		}
-		else if (colorStr == VTEXT("forestgreen")) {
-			return ForestGreen;
-		}
-		else if (colorStr == VTEXT("green")) {
-			return Green;
-		}
-		else if (colorStr == VTEXT("darkgreen")) {
-			return DarkGreen;
-		}
-		else if (colorStr == VTEXT("yellowgreen")) {
-			return YellowGreen;
-		}
-		else if (colorStr == VTEXT("olivedrab")) {
-			return OliveDrab;
-		}
-		else if (colorStr == VTEXT("olive")) {
-			return Olive;
-		}
-		else if (colorStr == VTEXT("darkolivegreen")) {
-			return DarkOliveGreen;
-		}
-		else if (colorStr == VTEXT("mediumaquamarine")) {
-			return MediumAquamarine;
-		}
-		else if (colorStr == VTEXT("darkseagreen")) {
-			return DarkSeaGreen;
-		}
-		else if (colorStr == VTEXT("lightseagreen")) {
-			return LightSeaGreen;
-		}
-		else if (colorStr == VTEXT("darkcyan")) {
-			return DarkCyan;
-		}
-		else if (colorStr == VTEXT("teal")) {
-			return Teal;
-		}
-		else if (colorStr == VTEXT("aqua")) {
-			return Aqua;
-		}
-		else if (colorStr == VTEXT("cyan")) {
-			return Cyan;
-		}
-		else if (colorStr == VTEXT("lightcyan")) {
-			return LightCyan;
-		}
-		else if (colorStr == VTEXT("paleturquoise")) {
-			return PaleTurquoise;
-		}
-		else if (colorStr == VTEXT("aquamarine")) {
-			return Aquamarine;
-		}
-		else if (colorStr == VTEXT("turquoise")) {
-			return Turquoise;
-		}
-		else if (colorStr == VTEXT("mediumturquoise")) {
-			return MediumTurquoise;
-		}
-		else if (colorStr == VTEXT("darkturquoise")) {
-			return DarkTurquoise;
-		}
-		else if (colorStr == VTEXT("cadetblue")) {
-			return CadetBlue;
-		}
-		else if (colorStr == VTEXT("steelblue")) {
-			return SteelBlue;
-		}
-		else if (colorStr == VTEXT("lightsteelblue")) {
-			return LightSteelBlue;
-		}
-		else if (colorStr == VTEXT("lightblue")) {
-			return LightBlue;
-		}
-		else if (colorStr == VTEXT("powderblue")) {
-			return PowderBlue;
-		}
-		else if (colorStr == VTEXT("skyblue")) {
-			return SkyBlue;
-		}
-		else if (colorStr == VTEXT("lightskyblue")) {
-			return LightSkyBlue;
-		}
-		else if (colorStr == VTEXT("deepskyblue")) {
-			return DeepSkyBlue;
-		}
-		else if (colorStr == VTEXT("dodgerblue")) {
-			return DodgerBlue;
-		}
-		else if (colorStr == VTEXT("cornflowerblue")) {
-			return CornflowerBlue;
-		}
-		else if (colorStr == VTEXT("mediumslateblue")) {
-			return MediumSlateBlue;
-		}
-		else if (colorStr == VTEXT("royalblue")) {
-			return RoyalBlue;
-		}
-		else if (colorStr == VTEXT("blue")) {
-			return Blue;
-		}
-		else if (colorStr == VTEXT("mediumblue")) {
-			return MediumBlue;
-		}
-		else if (colorStr == VTEXT("darkblue")) {
-			return DarkBlue;
-		}
-		else if (colorStr == VTEXT("navy")) {
-			return Navy;
-		}
-		else if (colorStr == VTEXT("midnightblue")) {
-			return MidnightBlue;
-		}
-		else if (colorStr == VTEXT("cornsilk")) {
-			return Cornsilk;
-		}
-		else if (colorStr == VTEXT("blanchedalmond")) {
-			return BlanchedAlmond;
-		}
-		else if (colorStr == VTEXT("bisque")) {
-			return Bisque;
-		}
-		else if (colorStr == VTEXT("navajowhite")) {
-			return NavajoWhite;
-		}
-		else if (colorStr == VTEXT("wheat")) {
-			return Wheat;
-		}
-		else if (colorStr == VTEXT("burlywood")) {
-			return BurlyWood;
-		}
-		else if (colorStr == VTEXT("tan")) {
-			return Tan;
-		}
-		else if (colorStr == VTEXT("rosybrown")) {
-			return RosyBrown;
-		}
-		else if (colorStr == VTEXT("sandybrown")) {
-			return SandyBrown;
-		}
-		else if (colorStr == VTEXT("goldenrod")) {
-			return Goldenrod;
-		}
-		else if (colorStr == VTEXT("darkgoldenrod")) {
-			return DarkGoldenrod;
-		}
-		else if (colorStr == VTEXT("peru")) {
-			return Peru;
-		}
-		else if (colorStr == VTEXT("chocolate")) {
-			return Chocolate;
-		}
-		else if (colorStr == VTEXT("saddlebrown")) {
-			return SaddleBrown;
-		}
-		else if (colorStr == VTEXT("sienna")) {
-			return Sienna;
-		}
-		else if (colorStr == VTEXT("brown")) {
-			return Brown;
-		}
-		else if (colorStr == VTEXT("maroon")) {
-			return Maroon;
-		}
-		else if (colorStr == VTEXT("white")) {
-			return White;
-		}
-		else if (colorStr == VTEXT("snow")) {
-			return Snow;
-		}
-		else if (colorStr == VTEXT("honeydew")) {
-			return Honeydew;
-		}
-		else if (colorStr == VTEXT("mintcream")) {
-			return MintCream;
-		}
-		else if (colorStr == VTEXT("azure")) {
-			return Azure;
-		}
-		else if (colorStr == VTEXT("aliceblue")) {
-			return AliceBlue;
-		}
-		else if (colorStr == VTEXT("ghostwhite")) {
-			return GhostWhite;
-		}
-		else if (colorStr == VTEXT("whitesmoke")) {
-			return WhiteSmoke;
-		}
-		else if (colorStr == VTEXT("seashell")) {
-			return SeaShell;
-		}
-		else if (colorStr == VTEXT("beige")) {
-			return Beige;
-		}
-		else if (colorStr == VTEXT("oldlace")) {
-			return OldLace;
-		}
-		else if (colorStr == VTEXT("floralwhite")) {
-			return FloralWhite;
-		}
-		else if (colorStr == VTEXT("ivory")) {
-			return Ivory;
-		}
-		else if (colorStr == VTEXT("antiquewhite")) {
-			return AntiqueWhite;
-		}
-		else if (colorStr == VTEXT("linen")) {
-			return Linen;
-		}
-		else if (colorStr == VTEXT("lavenderblush")) {
-			return LavenderBlush;
-		}
-		else if (colorStr == VTEXT("mistyrose")) {
-			return MistyRose;
-		}
-		else if (colorStr == VTEXT("gainsboro")) {
-			return Gainsboro;
-		}
-		else if (colorStr == VTEXT("lightgrey")) {
-			return LightGrey;
-		}
-		else if (colorStr == VTEXT("silver")) {
-			return Silver;
-		}
-		else if (colorStr == VTEXT("darkgrey")) {
-			return DarkGrey;
-		}
-		else if (colorStr == VTEXT("gray")) {
-			return Gray;
-		}
-		else if (colorStr == VTEXT("dimgray")) {
-			return DimGray;
-		}
-		else if (colorStr == VTEXT("lightslategray")) {
-			return LightSlateGray;
-		}
-		else if (colorStr == VTEXT("slategray")) {
-			return SlateGray;
-		}
-		else if (colorStr == VTEXT("darkslategray")) {
-			return DarkSlateGray;
-		}
-		else {
+		inline Color ColorFromUString(UString colorStr)
+		{
+			if (colorStr == VTEXT("indianred")) {
+				return IndianRed;
+			}
+			if (colorStr == VTEXT("lightcoral")) {
+				return LightCoral;
+			}
+			if (colorStr == VTEXT("salmon")) {
+				return Salmon;
+			}
+			if (colorStr == VTEXT("darksalmon")) {
+				return DarkSalmon;
+			}
+			if (colorStr == VTEXT("lightsalmon")) {
+				return LightSalmon;
+			}
+			if (colorStr == VTEXT("crimson")) {
+				return Crimson;
+			}
+			if (colorStr == VTEXT("red")) {
+				return Red;
+			}
+			if (colorStr == VTEXT("firebrick")) {
+				return FireBrick;
+			}
+			if (colorStr == VTEXT("darkred")) {
+				return DarkRed;
+			}
+			if (colorStr == VTEXT("pink")) {
+				return Pink;
+			}
+			if (colorStr == VTEXT("lightpink")) {
+				return LightPink;
+			}
+			if (colorStr == VTEXT("hotpink")) {
+				return HotPink;
+			}
+			if (colorStr == VTEXT("deeppink")) {
+				return DeepPink;
+			}
+			if (colorStr == VTEXT("mediumvioletred")) {
+				return MediumVioletRed;
+			}
+			if (colorStr == VTEXT("palevioletred")) {
+				return PaleVioletRed;
+			}
+			if (colorStr == VTEXT("coral")) {
+				return Coral;
+			}
+			if (colorStr == VTEXT("tomato")) {
+				return Tomato;
+			}
+			if (colorStr == VTEXT("orangered")) {
+				return OrangeRed;
+			}
+			if (colorStr == VTEXT("darkorange")) {
+				return DarkOrange;
+			}
+			if (colorStr == VTEXT("orange")) {
+				return Orange;
+			}
+			if (colorStr == VTEXT("gold")) {
+				return Gold;
+			}
+			if (colorStr == VTEXT("yellow")) {
+				return Yellow;
+			}
+			if (colorStr == VTEXT("lightyellow")) {
+				return LightYellow;
+			}
+			if (colorStr == VTEXT("lemonchion")) {
+				return LemonChion;
+			}
+			if (colorStr == VTEXT("lightgoldenrodyellow")) {
+				return LightGoldenRodYellow;
+			}
+			if (colorStr == VTEXT("papayawhip")) {
+				return PapayaWhip;
+			}
+			if (colorStr == VTEXT("moccasin")) {
+				return Moccasin;
+			}
+			if (colorStr == VTEXT("peachpu")) {
+				return PeachPu;
+			}
+			if (colorStr == VTEXT("palegoldenrod")) {
+				return PaleGoldenRod;
+			}
+			if (colorStr == VTEXT("khaki")) {
+				return Khaki;
+			}
+			if (colorStr == VTEXT("darkkhaki")) {
+				return DarkKhaki;
+			}
+			if (colorStr == VTEXT("lavender")) {
+				return Lavender;
+			}
+			if (colorStr == VTEXT("thistle")) {
+				return Thistle;
+			}
+			if (colorStr == VTEXT("plum")) {
+				return Plum;
+			}
+			if (colorStr == VTEXT("violet")) {
+				return Violet;
+			}
+			if (colorStr == VTEXT("orchid")) {
+				return Orchid;
+			}
+			if (colorStr == VTEXT("magenta")) {
+				return Magenta;
+			}
+			if (colorStr == VTEXT("mediumorchid")) {
+				return MediumOrchid;
+			}
+			if (colorStr == VTEXT("mediumpurple")) {
+				return MediumPurple;
+			}
+			if (colorStr == VTEXT("blueviolet")) {
+				return BlueViolet;
+			}
+			if (colorStr == VTEXT("darkviolet")) {
+				return DarkViolet;
+			}
+			if (colorStr == VTEXT("darkorchid")) {
+				return DarkOrchid;
+			}
+			if (colorStr == VTEXT("darkmagenta")) {
+				return DarkMagenta;
+			}
+			if (colorStr == VTEXT("purple")) {
+				return Purple;
+			}
+			if (colorStr == VTEXT("indigo")) {
+				return Indigo;
+			}
+			if (colorStr == VTEXT("slateblue")) {
+				return SlateBlue;
+			}
+			if (colorStr == VTEXT("darkslateblue")) {
+				return DarkSlateBlue;
+			}
+			if (colorStr == VTEXT("greenyellow")) {
+				return GreenYellow;
+			}
+			if (colorStr == VTEXT("chartreuse")) {
+				return Chartreuse;
+			}
+			if (colorStr == VTEXT("lawngreen")) {
+				return LawnGreen;
+			}
+			if (colorStr == VTEXT("lime")) {
+				return Lime;
+			}
+			if (colorStr == VTEXT("limegreen")) {
+				return LimeGreen;
+			}
+			if (colorStr == VTEXT("palegreen")) {
+				return PaleGreen;
+			}
+			if (colorStr == VTEXT("lightgreen")) {
+				return LightGreen;
+			}
+			if (colorStr == VTEXT("mediumspringgreen")) {
+				return MediumSpringGreen;
+			}
+			if (colorStr == VTEXT("springgreen")) {
+				return SpringGreen;
+			}
+			if (colorStr == VTEXT("seagreen")) {
+				return SeaGreen;
+			}
+			if (colorStr == VTEXT("forestgreen")) {
+				return ForestGreen;
+			}
+			if (colorStr == VTEXT("green")) {
+				return Green;
+			}
+			if (colorStr == VTEXT("darkgreen")) {
+				return DarkGreen;
+			}
+			if (colorStr == VTEXT("yellowgreen")) {
+				return YellowGreen;
+			}
+			if (colorStr == VTEXT("olivedrab")) {
+				return OliveDrab;
+			}
+			if (colorStr == VTEXT("olive")) {
+				return Olive;
+			}
+			if (colorStr == VTEXT("darkolivegreen")) {
+				return DarkOliveGreen;
+			}
+			if (colorStr == VTEXT("mediumaquamarine")) {
+				return MediumAquamarine;
+			}
+			if (colorStr == VTEXT("darkseagreen")) {
+				return DarkSeaGreen;
+			}
+			if (colorStr == VTEXT("lightseagreen")) {
+				return LightSeaGreen;
+			}
+			if (colorStr == VTEXT("darkcyan")) {
+				return DarkCyan;
+			}
+			if (colorStr == VTEXT("teal")) {
+				return Teal;
+			}
+			if (colorStr == VTEXT("aqua")) {
+				return Aqua;
+			}
+			if (colorStr == VTEXT("cyan")) {
+				return Cyan;
+			}
+			if (colorStr == VTEXT("lightcyan")) {
+				return LightCyan;
+			}
+			if (colorStr == VTEXT("paleturquoise")) {
+				return PaleTurquoise;
+			}
+			if (colorStr == VTEXT("aquamarine")) {
+				return Aquamarine;
+			}
+			if (colorStr == VTEXT("turquoise")) {
+				return Turquoise;
+			}
+			if (colorStr == VTEXT("mediumturquoise")) {
+				return MediumTurquoise;
+			}
+			if (colorStr == VTEXT("darkturquoise")) {
+				return DarkTurquoise;
+			}
+			if (colorStr == VTEXT("cadetblue")) {
+				return CadetBlue;
+			}
+			if (colorStr == VTEXT("steelblue")) {
+				return SteelBlue;
+			}
+			if (colorStr == VTEXT("lightsteelblue")) {
+				return LightSteelBlue;
+			}
+			if (colorStr == VTEXT("lightblue")) {
+				return LightBlue;
+			}
+			if (colorStr == VTEXT("powderblue")) {
+				return PowderBlue;
+			}
+			if (colorStr == VTEXT("skyblue")) {
+				return SkyBlue;
+			}
+			if (colorStr == VTEXT("lightskyblue")) {
+				return LightSkyBlue;
+			}
+			if (colorStr == VTEXT("deepskyblue")) {
+				return DeepSkyBlue;
+			}
+			if (colorStr == VTEXT("dodgerblue")) {
+				return DodgerBlue;
+			}
+			if (colorStr == VTEXT("cornflowerblue")) {
+				return CornflowerBlue;
+			}
+			if (colorStr == VTEXT("mediumslateblue")) {
+				return MediumSlateBlue;
+			}
+			if (colorStr == VTEXT("royalblue")) {
+				return RoyalBlue;
+			}
+			if (colorStr == VTEXT("blue")) {
+				return Blue;
+			}
+			if (colorStr == VTEXT("mediumblue")) {
+				return MediumBlue;
+			}
+			if (colorStr == VTEXT("darkblue")) {
+				return DarkBlue;
+			}
+			if (colorStr == VTEXT("navy")) {
+				return Navy;
+			}
+			if (colorStr == VTEXT("midnightblue")) {
+				return MidnightBlue;
+			}
+			if (colorStr == VTEXT("cornsilk")) {
+				return Cornsilk;
+			}
+			if (colorStr == VTEXT("blanchedalmond")) {
+				return BlanchedAlmond;
+			}
+			if (colorStr == VTEXT("bisque")) {
+				return Bisque;
+			}
+			if (colorStr == VTEXT("navajowhite")) {
+				return NavajoWhite;
+			}
+			if (colorStr == VTEXT("wheat")) {
+				return Wheat;
+			}
+			if (colorStr == VTEXT("burlywood")) {
+				return BurlyWood;
+			}
+			if (colorStr == VTEXT("tan")) {
+				return Tan;
+			}
+			if (colorStr == VTEXT("rosybrown")) {
+				return RosyBrown;
+			}
+			if (colorStr == VTEXT("sandybrown")) {
+				return SandyBrown;
+			}
+			if (colorStr == VTEXT("goldenrod")) {
+				return Goldenrod;
+			}
+			if (colorStr == VTEXT("darkgoldenrod")) {
+				return DarkGoldenrod;
+			}
+			if (colorStr == VTEXT("peru")) {
+				return Peru;
+			}
+			if (colorStr == VTEXT("chocolate")) {
+				return Chocolate;
+			}
+			if (colorStr == VTEXT("saddlebrown")) {
+				return SaddleBrown;
+			}
+			if (colorStr == VTEXT("sienna")) {
+				return Sienna;
+			}
+			if (colorStr == VTEXT("brown")) {
+				return Brown;
+			}
+			if (colorStr == VTEXT("maroon")) {
+				return Maroon;
+			}
+			if (colorStr == VTEXT("white")) {
+				return White;
+			}
+			if (colorStr == VTEXT("snow")) {
+				return Snow;
+			}
+			if (colorStr == VTEXT("honeydew")) {
+				return Honeydew;
+			}
+			if (colorStr == VTEXT("mintcream")) {
+				return MintCream;
+			}
+			if (colorStr == VTEXT("azure")) {
+				return Azure;
+			}
+			if (colorStr == VTEXT("aliceblue")) {
+				return AliceBlue;
+			}
+			if (colorStr == VTEXT("ghostwhite")) {
+				return GhostWhite;
+			}
+			if (colorStr == VTEXT("whitesmoke")) {
+				return WhiteSmoke;
+			}
+			if (colorStr == VTEXT("seashell")) {
+				return SeaShell;
+			}
+			if (colorStr == VTEXT("beige")) {
+				return Beige;
+			}
+			if (colorStr == VTEXT("oldlace")) {
+				return OldLace;
+			}
+			if (colorStr == VTEXT("floralwhite")) {
+				return FloralWhite;
+			}
+			if (colorStr == VTEXT("ivory")) {
+				return Ivory;
+			}
+			if (colorStr == VTEXT("antiquewhite")) {
+				return AntiqueWhite;
+			}
+			if (colorStr == VTEXT("linen")) {
+				return Linen;
+			}
+			if (colorStr == VTEXT("lavenderblush")) {
+				return LavenderBlush;
+			}
+			if (colorStr == VTEXT("mistyrose")) {
+				return MistyRose;
+			}
+			if (colorStr == VTEXT("gainsboro")) {
+				return Gainsboro;
+			}
+			if (colorStr == VTEXT("lightgrey")) {
+				return LightGrey;
+			}
+			if (colorStr == VTEXT("silver")) {
+				return Silver;
+			}
+			if (colorStr == VTEXT("darkgrey")) {
+				return DarkGrey;
+			}
+			if (colorStr == VTEXT("gray")) {
+				return Gray;
+			}
+			if (colorStr == VTEXT("dimgray")) {
+				return DimGray;
+			}
+			if (colorStr == VTEXT("lightslategray")) {
+				return LightSlateGray;
+			}
+			if (colorStr == VTEXT("slategray")) {
+				return SlateGray;
+			}
+			if (colorStr == VTEXT("darkslategray")) {
+				return DarkSlateGray;
+			}
 			return Black;
 		}
 	}
-
 }
 
 #endif

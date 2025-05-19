@@ -5,42 +5,46 @@
 #include <vix_singleton.h>
 #include <vix_renderer.h>
 
-namespace Vixen {
+namespace Vixen
+{
 
     class VIX_API Renderer : public Singleton<Renderer>
     {
     public:
-        static bool		    Initialize(void* HWND);
+        ~Renderer();
 
-        static void		    DeInitialize();
+        static bool Initialize(void* HWND);
 
-        static void         InitializeSpriteBatch();
+        static void DeInitialize();
 
-        static void         SetClearColor(const Color& c);
+        static void InitializeSpriteBatch();
 
-        static void         ClearBuffer(ClearArgs args);
+        static void SetClearColor(const Color& c);
 
-        static void         SwapBuffers();
+        static void ClearBuffer(ClearArgs args);
 
-        static void         Render2DText(Font* font, UString text, const Vector2& position);
+        static void SwapBuffers();
 
-        static void         ResizeBuffers(uint32_t width, uint32_t height);
+        static void Render2DText(Font* font, UString text, const Vector2& position);
 
-		static void			RenderFinal();
+        static void ResizeBuffers(uint32_t width, uint32_t height);
 
-		static void			RenderDeferred();
-		
-		static void			RenderLights(ICamera3D* camera, Model* model, std::vector<PointLight*>& lights);
+        static void RenderFinal();
 
-		static void			RenderLights(ICamera3D* camera, Model* model, std::vector<SpotLight*>& lights);
+        static void RenderDeferred();
 
-        static IRenderer*   Handle();
+        static void RenderLights(ICamera3D* camera, Model* model, std::vector<PointLight*>& lights);
 
-		static ICamera2D*   Camera2D();
+        static void RenderLights(ICamera3D* camera, Model* model, std::vector<SpotLight*>& lights);
+
+        static IRenderer* Handle();
+
+        static ICamera2D* Camera2D();
+
     private:
-        IRenderer*  m_renderer;
+        IRenderer* m_renderer;
     };
 
-}
+} // namespace Vixen
 
 #endif

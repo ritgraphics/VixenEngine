@@ -29,11 +29,8 @@
 #include <vix_keyboardstate.h>
 #include <vix_mousestate.h>
 
-#ifdef VIX_SYS_WINDOWS
-#include <SDL.h>
-#elif defined(VIX_SYS_LINUX)
-#include <SDL2/SDL.h>
-#endif#include <SDL.h>
+#include <SDL3/SDL.h>
+
 #include <map>
 
 namespace Vixen {
@@ -104,15 +101,15 @@ namespace Vixen {
 
 	class VIX_API SDLControllerState
 	{
-		typedef std::map<SDL_GameControllerButton, bool> ControllerButtonState;
-		typedef std::map<SDL_GameControllerAxis, Sint16> AxisState;
+		typedef std::map<SDL_GamepadButton, bool> ControllerButtonState;
+		typedef std::map<SDL_GamepadAxis, Sint16> AxisState;
 	public:
 		SDLControllerState();
 
 		void Connected(bool status, int controller);
-		void Axis(SDL_GameControllerAxis axis, Sint16 val, int controller);
-		void ButtonDown(SDL_GameControllerButton button, int controller);
-		void ButtonUp(SDL_GameControllerButton button, int controller);
+		void Axis(SDL_GamepadAxis axis, Sint16 val, int controller);
+		void ButtonDown(SDL_GamepadButton button, int controller);
+		void ButtonUp(SDL_GamepadButton button, int controller);
 		void UpdatePrev();
 
 		bool VConnected(int controller);
@@ -127,8 +124,8 @@ namespace Vixen {
 		ControllerButtonState	m_previousControllers[4];
 		AxisState				m_currentAxis[4];
 
-		SDL_GameControllerButton convertFromIBUTTON(IBUTTON button);
-		SDL_GameControllerAxis convertFromIAXIS(IAXIS axis);
+		SDL_GamepadButton convertFromIBUTTON(IBUTTON button);
+		SDL_GamepadAxis convertFromIAXIS(IAXIS axis);
 	};
 
 }

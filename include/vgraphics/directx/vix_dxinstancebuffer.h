@@ -5,7 +5,8 @@
 #include <vix_instancebuffer.h>
 #include <vix_directx.h>
 
-namespace Vixen {
+namespace Vixen
+{
 
     struct DXInstanceData
     {
@@ -27,13 +28,12 @@ namespace Vixen {
         ID3D11ShaderResourceView* GetSRV();
 
     private:
-        ID3D11Device*          m_device;
-        ID3D11DeviceContext*   m_context;
-        ID3D11Buffer*          m_buffer;
-
-        ID3D11ShaderResourceView* m_srv;
+        ID3D11Device*                            m_device;
+        ID3D11DeviceContext*                     m_context;
+        winrt::com_ptr<ID3D11Buffer>             m_buffer;
+        winrt::com_ptr<ID3D11ShaderResourceView> m_srv;
     };
 
-}
+} // namespace Vixen
 
 #endif

@@ -28,11 +28,7 @@
 #include <vix_file_interface.h>
 #include <cstdio>
 
-
-
 namespace Vixen {
-
-
 
 	class VIX_API File : public IFile
 	{

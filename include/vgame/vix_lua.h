@@ -38,7 +38,7 @@ extern "C" {
 }
 #endif
 
-#include <LuaIntf/LuaIntf.h>
+#include <LuaIntf.h>
 
 
 namespace Vixen {

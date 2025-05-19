@@ -42,13 +42,9 @@ namespace Vixen {
 	inline
 	bool VIX_API XMLErrCheck(tinyxml2::XMLError error, UString& errorMsg)
 	{
-		bool fail = true;
+		bool fail = error != tinyxml2::XMLError::XML_SUCCESS;
 		switch (error)
 		{
-		case tinyxml2::XML_NO_ERROR:
-			errorMsg = VTEXT("XML_NO_ERROR");
-			fail = false;
-			break;
 		case tinyxml2::XML_NO_ATTRIBUTE:
 			errorMsg = VTEXT("XML_NO_ATTRIBUTE");
 			break;
@@ -64,17 +60,11 @@ namespace Vixen {
 		case tinyxml2::XML_ERROR_FILE_READ_ERROR:
 			errorMsg = VTEXT("XML_ERROR_FILE_READ_ERROR");
 			break;
-		case tinyxml2::XML_ERROR_ELEMENT_MISMATCH:
-			errorMsg = VTEXT("XML_ERROR_ELEMENT_MISMATCH");
-			break;
 		case tinyxml2::XML_ERROR_PARSING_ELEMENT:
 			errorMsg = VTEXT("XML_ERROR_PARSING_ELEMENT");
 			break;
 		case tinyxml2::XML_ERROR_PARSING_ATTRIBUTE:
 			errorMsg = VTEXT("XML_ERROR_PARSING_ATTRIBUTE");
-			break;
-		case tinyxml2::XML_ERROR_IDENTIFYING_TAG:
-			errorMsg = VTEXT("XML_ERROR_IDENTIFYING_TAG");
 			break;
 		case tinyxml2::XML_ERROR_PARSING_TEXT:
 			errorMsg = VTEXT("XML_ERROR_PARSING_TEXT");

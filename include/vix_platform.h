@@ -116,4 +116,6 @@ typedef unsigned char BYTE;
 #define VIX_LARGE_BUFSIZE 10240
 #endif
 
+#include <memory>
+
 #endif

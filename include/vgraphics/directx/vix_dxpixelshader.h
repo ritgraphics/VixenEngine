@@ -49,8 +49,7 @@ namespace Vixen {
         void VUnbind() override;
 
     private:
-        ID3D11PixelShader* m_shader;
-
+        winrt::com_ptr<ID3D11PixelShader> m_shader;
     };
 
 }

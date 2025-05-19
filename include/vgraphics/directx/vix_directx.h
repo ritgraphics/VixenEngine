@@ -24,7 +24,10 @@
 #ifndef VIX_DIRECTX_H
 #define VIX_DIRECTX_H
 
+#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+
+#include <winrt/base.h>
 #include <d3d11.h>
 #include <d3dcompiler.h>
 #include <DirectXMath.h>

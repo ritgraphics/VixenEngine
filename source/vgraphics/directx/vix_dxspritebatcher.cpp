@@ -27,6 +27,7 @@
 #include <vix_rectangle.h>
 #include <vix_resourcemanager.h>
 #include <array>
+#include <algorithm>
 
 namespace Vixen {
 
@@ -70,7 +71,7 @@ namespace Vixen {
         blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 
         
-        m_device->CreateBlendState(&blendDesc, &m_blendState);
+        m_device->CreateBlendState(&blendDesc, m_blendState.put());
 
 
         D3D11_DEPTH_STENCIL_DESC dsDesc;
@@ -88,7 +89,7 @@ namespace Vixen {
         dsDesc.BackFace = dsDesc.FrontFace;
 
        
-        m_device->CreateDepthStencilState(&dsDesc, &m_depthState);
+        m_device->CreateDepthStencilState(&dsDesc, m_depthState.put());
     }
 
     DXSpriteBatcher::~DXSpriteBatcher()
@@ -98,9 +99,6 @@ namespace Vixen {
         
         delete m_vBuffer;
         delete m_iBuffer;
-
-        ReleaseCOM(m_blendState);
-        ReleaseCOM(m_depthState);
     }
 
     void DXSpriteBatcher::Begin(BatchSortMode mode)
@@ -324,8 +322,8 @@ namespace Vixen {
 
     void DXSpriteBatcher::render_textures()
     {
-        m_context->OMSetDepthStencilState(m_depthState, 0);
-        m_context->OMSetBlendState(m_blendState, NULL, 0xfffffffff);
+        m_context->OMSetDepthStencilState(m_depthState.get(), 0);
+        m_context->OMSetBlendState(m_blendState.get(), NULL, 0xfffffffff);
 
 
         m_vShader->SetMatrix4x4("projection", m_camera2D->Projection());

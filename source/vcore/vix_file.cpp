@@ -190,6 +190,7 @@ namespace Vixen {
 	{
 #ifdef VIX_SYS_WINDOWS
 		UChar s_buffer[VIX_BUFSIZE];
+		_wcserror_s(s_buffer, VIX_BUFSIZE, errno);
 		_wcserror_s(s_buffer, errno);
 		DebugPrintF(VTEXT("FileError: %s"), s_buffer);
 #else

@@ -38,13 +38,10 @@ namespace Vixen {
         bd.ByteWidth = sizeof(unsigned short) * m_count;
         bd.BindFlags = D3D11_BIND_INDEX_BUFFER;
         bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-        m_device->CreateBuffer(&bd, nullptr, &m_buffer);
+        m_device->CreateBuffer(&bd, nullptr, m_buffer.put());
     }
     
-    DXIndexBuffer::~DXIndexBuffer()
-    {
-        ReleaseCOM(m_buffer);
-    }
+    DXIndexBuffer::~DXIndexBuffer() = default;
 
     void DXIndexBuffer::VSetData(const unsigned short* data)
     {
@@ -57,7 +54,7 @@ namespace Vixen {
         D3D11_SUBRESOURCE_DATA IndexInitData;
         ZeroMemory(&IndexInitData, sizeof(IndexInitData));
         IndexInitData.pSysMem = data;
-        m_device->CreateBuffer(&ibd, &IndexInitData, &m_buffer);
+        m_device->CreateBuffer(&ibd, &IndexInitData, m_buffer.put());
     }
 
     void DXIndexBuffer::VUpdateSubData(size_t offset, size_t stride, size_t count, const void* data)
@@ -66,18 +63,18 @@ namespace Vixen {
 
         D3D11_MAP type = D3D11_MAP_WRITE_NO_OVERWRITE;
         D3D11_MAPPED_SUBRESOURCE map;
-        hr = m_context->Map(m_buffer, 0, type, 0, &map);
+        hr = m_context->Map(m_buffer.get(), 0, type, 0, &map);
         if (SUCCEEDED(hr))
         {
             unsigned short* _dest = ((unsigned short*)map.pData) + offset;
             memcpy((void*)_dest, data, stride * count);
         }
-        m_context->Unmap(m_buffer, 0);
+        m_context->Unmap(m_buffer.get(), 0);
     }
 
     void DXIndexBuffer::VBind()
     {
-        m_context->IASetIndexBuffer(m_buffer, DXGI_FORMAT_R16_UINT, 0);
+        m_context->IASetIndexBuffer(m_buffer.get(), DXGI_FORMAT_R16_UINT, 0);
     }
 
     void DXIndexBuffer::VUnbind()

@@ -28,14 +28,8 @@
 #include <vix_gamewindow.h>
 #include <vix_time.h>
 #include <vix_sdlinput.h>
-#ifdef VIX_SYS_WINDOWS
-#include <SDL.h>
-#include <SDL_syswm.h>
-#undef main
-#elif defined(VIX_SYS_LINUX)
-#include <SDL2/SDL.h>
-#endif
 
+#include <SDL3/SDL.h>
 
 
 namespace Vixen {
@@ -107,15 +101,13 @@ namespace Vixen {
         IMouseState*        VMouseState()                          override;
 		SDLControllerState* VControllerState();
 
-		void                OutputDisplayModes();
-
 	private:
 		SDL_Window*			m_windowHandle;
 		SDL_GLContext		m_context;
         SDL_GW_Params		m_params;
         void*               m_nativeHandle;
 		int					m_controllerIndeces[4];
-		SDL_GameController* m_controllers[4];
+		SDL_Gamepad* m_controllers[4];
 		int					GetPlayerFromControllerIndex(int controllerIndex);
 	};
 

@@ -8,6 +8,8 @@
 
 namespace Vixen {
 
+    Renderer::~Renderer() = default;
+
     bool Renderer::Initialize(void* HWND)
     {
         Renderer& _renderer = Renderer::instance();
@@ -34,6 +36,7 @@ namespace Vixen {
         Renderer& _renderer = Renderer::instance();
 
         _renderer.m_renderer->VDeInitialize();
+        //_renderer.m_renderer.reset();
     }
 
     void Renderer::ClearBuffer(ClearArgs args)

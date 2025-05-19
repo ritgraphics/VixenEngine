@@ -41,12 +41,12 @@ namespace Vixen {
 		m_prevWY = 0;
 		m_prevX = 0;
 		m_prevY = 0;
-		m_current[MOUSECS_LEFT].state = SDL_RELEASED;
-		m_current[MOUSECS_RIGHT].state = SDL_RELEASED;
-		m_current[MOUSECS_MIDDLE].state = SDL_RELEASED;
-		m_prev[MOUSECS_LEFT].state = SDL_RELEASED;
-		m_prev[MOUSECS_RIGHT].state = SDL_RELEASED;
-		m_prev[MOUSECS_MIDDLE].state = SDL_RELEASED;
+		m_current[MOUSECS_LEFT].state = false;
+		m_current[MOUSECS_RIGHT].state = false;
+		m_current[MOUSECS_MIDDLE].state = false;
+		m_prev[MOUSECS_LEFT].state = false;
+		m_prev[MOUSECS_RIGHT].state = false;
+		m_prev[MOUSECS_MIDDLE].state = false;
 
 	}
 
@@ -98,31 +98,31 @@ namespace Vixen {
 	bool SDLMouseState::VButtonPress(IMBUTTON button)
 	{
 		if(button == IMBUTTON::LEFT)
-            return m_current[MOUSECS_LEFT].state == SDL_PRESSED;
+            return m_current[MOUSECS_LEFT].state == true;
         else if(button == IMBUTTON::RIGHT)
-            return m_current[MOUSECS_RIGHT].state == SDL_PRESSED;
+            return m_current[MOUSECS_RIGHT].state == true;
         else
-            return m_current[MOUSECS_MIDDLE].state == SDL_PRESSED;
+            return m_current[MOUSECS_MIDDLE].state == true;
 	}
 
 	bool SDLMouseState::VButtonRelease(IMBUTTON button)
 	{
         if (button == IMBUTTON::LEFT)
-            return m_current[MOUSECS_LEFT].state == SDL_RELEASED && m_prev[MOUSECS_LEFT].state == SDL_PRESSED;
+            return m_current[MOUSECS_LEFT].state == false && m_prev[MOUSECS_LEFT].state == true;
         else if(button == IMBUTTON::RIGHT)
-            return m_current[MOUSECS_RIGHT].state == SDL_RELEASED && m_prev[MOUSECS_RIGHT].state == SDL_PRESSED;
+            return m_current[MOUSECS_RIGHT].state == false && m_prev[MOUSECS_RIGHT].state == true;
         else
-            return m_current[MOUSECS_MIDDLE].state == SDL_RELEASED && m_prev[MOUSECS_MIDDLE].state == SDL_PRESSED;
+            return m_current[MOUSECS_MIDDLE].state == false && m_prev[MOUSECS_MIDDLE].state == true;
 	}
 
 	bool SDLMouseState::VButtonPressSingle(IMBUTTON button)
 	{
         if(button == IMBUTTON::LEFT)
-            return m_current[MOUSECS_LEFT].state == SDL_PRESSED && m_prev[MOUSECS_LEFT].state == SDL_RELEASED;
+            return m_current[MOUSECS_LEFT].state == true && m_prev[MOUSECS_LEFT].state == false;
         else if(button == IMBUTTON::RIGHT)
-            return m_current[MOUSECS_RIGHT].state == SDL_PRESSED && m_prev[MOUSECS_RIGHT].state == SDL_RELEASED;
+            return m_current[MOUSECS_RIGHT].state == true && m_prev[MOUSECS_RIGHT].state == false;
         else
-            return m_current[MOUSECS_MIDDLE].state == SDL_PRESSED && m_prev[MOUSECS_MIDDLE].state == SDL_RELEASED;
+            return m_current[MOUSECS_MIDDLE].state == true && m_prev[MOUSECS_MIDDLE].state == false;
 	}
 
 	void SDLMouseState::MouseMove(int x, int y)
@@ -136,17 +136,17 @@ namespace Vixen {
 		switch(mbEvent.button)
 		{
 		case SDL_BUTTON_LEFT:
-			m_current[MOUSECS_LEFT].state = mbEvent.state;
+			m_current[MOUSECS_LEFT].state = mbEvent.down;
 			m_current[MOUSECS_LEFT].clicks = mbEvent.clicks;
 			break;
 
 		case SDL_BUTTON_RIGHT:
-			m_current[MOUSECS_RIGHT].state = mbEvent.state;
+			m_current[MOUSECS_RIGHT].state = mbEvent.down;
 			m_current[MOUSECS_RIGHT].clicks = mbEvent.clicks;
 			break;
 
 		case SDL_BUTTON_MIDDLE:
-			m_current[MOUSECS_MIDDLE].state = mbEvent.state;
+			m_current[MOUSECS_MIDDLE].state = mbEvent.down;
 			m_current[MOUSECS_MIDDLE].clicks = mbEvent.clicks;
 			break;
 		}
@@ -335,26 +335,26 @@ namespace Vixen {
 	{
 		for (int i = 0; i < 4; i++)
 		{
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_DPAD_UP] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_DPAD_LEFT] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_DPAD_DOWN] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_DPAD_RIGHT] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_A] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_B] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_X] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_Y] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_LEFTSHOULDER] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_RIGHTSHOULDER] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_START] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_BACK] = false;
-			m_currentControllers[i][SDL_CONTROLLER_BUTTON_INVALID] = false;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_LEFTX] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_LEFTY] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_RIGHTX] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_RIGHTY] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_TRIGGERLEFT] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_TRIGGERRIGHT] = 0;
-			m_currentAxis[i][SDL_CONTROLLER_AXIS_INVALID] = 0;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_DPAD_UP] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_DPAD_LEFT] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_DPAD_DOWN] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_DPAD_RIGHT] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_SOUTH] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_EAST] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_WEST] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_NORTH] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_LEFT_SHOULDER] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_START] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_BACK] = false;
+			m_currentControllers[i][SDL_GAMEPAD_BUTTON_INVALID] = false;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_LEFTX] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_LEFTY] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_RIGHTX] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_RIGHTY] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_LEFT_TRIGGER] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_RIGHT_TRIGGER] = 0;
+			m_currentAxis[i][SDL_GAMEPAD_AXIS_INVALID] = 0;
 		}
 	}
 
@@ -363,17 +363,17 @@ namespace Vixen {
 		m_currentControllerStatus[controller] = status;
 	}
 
-	void SDLControllerState::Axis(SDL_GameControllerAxis axis, Sint16 val, int controller)
+	void SDLControllerState::Axis(SDL_GamepadAxis axis, Sint16 val, int controller)
 	{
 		m_currentAxis[controller][axis] = val;
 	}
 
-	void SDLControllerState::ButtonDown(SDL_GameControllerButton button, int controller)
+	void SDLControllerState::ButtonDown(SDL_GamepadButton button, int controller)
 	{
 		m_currentControllers[controller][button] = true;
 	}
 
-	void SDLControllerState::ButtonUp(SDL_GameControllerButton button, int controller)
+	void SDLControllerState::ButtonUp(SDL_GamepadButton button, int controller)
 	{
 		m_currentControllers[controller][button] = false;
 	}
@@ -395,86 +395,86 @@ namespace Vixen {
 	float SDLControllerState::VAxis(IAXIS axis, int controller)
 	{
 		if (controller >= 4) return 0;
-		SDL_GameControllerAxis code = convertFromIAXIS(axis);
+		SDL_GamepadAxis code = convertFromIAXIS(axis);
 		return (float)m_currentAxis[controller][code] / (float)INT16_MAX;
 	}
 
 	bool SDLControllerState::VButtonPress(IBUTTON button, int controller)
 	{
 		if (controller >= 4) return false;
-		SDL_GameControllerButton code = convertFromIBUTTON(button);
+		SDL_GamepadButton code = convertFromIBUTTON(button);
 		return m_currentControllers[controller][code];
 	}
 
 	bool SDLControllerState::VButtonPressSingle(IBUTTON button, int controller)
 	{
 		if (controller >= 4) return false;
-		SDL_GameControllerButton code = convertFromIBUTTON(button);
+		SDL_GamepadButton code = convertFromIBUTTON(button);
 		return m_currentControllers[controller][code] && !m_previousControllers[controller][code];
 	}
 
 	bool SDLControllerState::VButtonRelease(IBUTTON button, int controller)
 	{
 		if (controller >= 4) return false;
-		SDL_GameControllerButton code = convertFromIBUTTON(button);
+		SDL_GamepadButton code = convertFromIBUTTON(button);
 		return !m_currentControllers[controller][code] && m_previousControllers[controller][code];
 	}
 
-	SDL_GameControllerButton SDLControllerState::convertFromIBUTTON(IBUTTON button)
+	SDL_GamepadButton SDLControllerState::convertFromIBUTTON(IBUTTON button)
 	{
 		switch (button)
 		{
 		case Vixen::IBUTTON::UP:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_UP;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_UP;
 		case Vixen::IBUTTON::LEFT:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_LEFT;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_LEFT;
 		case Vixen::IBUTTON::DOWN:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_DOWN;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_DOWN;
 		case Vixen::IBUTTON::RIGHT:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_DPAD_RIGHT;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_DPAD_RIGHT;
 		case Vixen::IBUTTON::A:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_A;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_SOUTH;
 		case Vixen::IBUTTON::B:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_B;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_EAST;
 		case Vixen::IBUTTON::X:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_X;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_WEST;
 		case Vixen::IBUTTON::Y:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_Y;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_NORTH;
 		case Vixen::IBUTTON::LEFTBUMPER:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_LEFTSHOULDER;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_LEFT_SHOULDER;
 		case Vixen::IBUTTON::RIGHTBUMPER:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_RIGHTSHOULDER;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_RIGHT_SHOULDER;
 		case Vixen::IBUTTON::LEFTSTICK:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_LEFTSTICK;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_LEFT_STICK;
 		case Vixen::IBUTTON::RIGHTSTICK:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_RIGHTSTICK;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_RIGHT_STICK;
 		case Vixen::IBUTTON::START:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_START;
 		case Vixen::IBUTTON::BACK:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_BACK;
 		default:
-			return SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_INVALID;
+			return SDL_GamepadButton::SDL_GAMEPAD_BUTTON_INVALID;
 		}
 	}
 
-	SDL_GameControllerAxis SDLControllerState::convertFromIAXIS(IAXIS axis)
+	SDL_GamepadAxis SDLControllerState::convertFromIAXIS(IAXIS axis)
 	{
 		switch (axis)
 		{
 		case Vixen::IAXIS::LEFTX:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_LEFTX;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_LEFTX;
 		case Vixen::IAXIS::LEFTY:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_LEFTY;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_LEFTY;
 		case Vixen::IAXIS::RIGHTX:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTX;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_RIGHTX;
 		case Vixen::IAXIS::RIGHTY:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTY;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_RIGHTY;
 		case Vixen::IAXIS::LEFTTRIGGER:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_TRIGGERLEFT;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_LEFT_TRIGGER;
 		case Vixen::IAXIS::RIGHTTRIGGER:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_TRIGGERRIGHT;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_RIGHT_TRIGGER;
 		default:
-			return SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_INVALID;
+			return SDL_GamepadAxis::SDL_GAMEPAD_AXIS_INVALID;
 		}
 	}
 }

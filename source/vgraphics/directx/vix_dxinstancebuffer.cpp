@@ -1,7 +1,7 @@
 #include <vix_dxinstancebuffer.h>
 
-
-namespace Vixen {
+namespace Vixen
+{
 
     DXInstanceBuffer::DXInstanceBuffer(size_t count, ID3D11Device* device, ID3D11DeviceContext* context)
     {
@@ -18,8 +18,7 @@ namespace Vixen {
         bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
         bd.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
         bd.StructureByteStride = sizeof(DXInstanceData);
-        m_device->CreateBuffer(&bd, nullptr, &m_buffer);
-
+        m_device->CreateBuffer(&bd, nullptr, m_buffer.put());
 
         D3D11_SHADER_RESOURCE_VIEW_DESC svd;
         ZeroMemory(&svd, sizeof(D3D11_SHADER_RESOURCE_VIEW_DESC));
@@ -29,16 +28,11 @@ namespace Vixen {
         svd.Buffer.ElementOffset = 0;
         svd.Buffer.NumElements = m_count;
         svd.Buffer.FirstElement = 0;
-      
-        m_device->CreateShaderResourceView(m_buffer, &svd, &m_srv);
-        
+
+        m_device->CreateShaderResourceView(m_buffer.get(), &svd, m_srv.put());
     }
 
-    DXInstanceBuffer::~DXInstanceBuffer()
-    {
-        ReleaseCOM(m_buffer);
-        ReleaseCOM(m_srv);
-    }
+    DXInstanceBuffer::~DXInstanceBuffer() = default;
 
     void DXInstanceBuffer::VSetData(const void* data)
     {
@@ -51,7 +45,7 @@ namespace Vixen {
         D3D11_SUBRESOURCE_DATA InitData;
         ZeroMemory(&InitData, sizeof(InitData));
         InitData.pSysMem = data;
-        m_device->CreateBuffer(&bd, &InitData, &m_buffer);
+        m_device->CreateBuffer(&bd, &InitData, m_buffer.put());
     }
 
     void DXInstanceBuffer::VUpdateSubData(size_t offset, size_t stride, size_t count, const void* data)
@@ -59,22 +53,22 @@ namespace Vixen {
 
         HRESULT hr = S_OK;
 
-        D3D11_MAP type = (offset <= 0) ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
+        D3D11_MAP                type = (offset <= 0) ? D3D11_MAP_WRITE_DISCARD : D3D11_MAP_WRITE_NO_OVERWRITE;
         D3D11_MAPPED_SUBRESOURCE map;
-        hr = m_context->Map(m_buffer, 0, type, 0, &map);
+        hr = m_context->Map(m_buffer.get(), 0, type, 0, &map);
         if (SUCCEEDED(hr))
         {
             memcpy(map.pData, data, stride * count);
         }
-        m_context->Unmap(m_buffer, 0);
-
+        m_context->Unmap(m_buffer.get(), 0);
     }
 
     void DXInstanceBuffer::VBind()
     {
-        unsigned stride = sizeof(DXInstanceData);
-        unsigned offset = 0;
-        m_context->IASetVertexBuffers(0, 1, &m_buffer, &stride, &offset);
+        unsigned      stride = sizeof(DXInstanceData);
+        unsigned      offset = 0;
+        ID3D11Buffer* buffers[] = {m_buffer.get()};
+        m_context->IASetVertexBuffers(0, 1, buffers, &stride, &offset);
     }
 
     void DXInstanceBuffer::VUnbind()
@@ -84,7 +78,7 @@ namespace Vixen {
 
     ID3D11ShaderResourceView* DXInstanceBuffer::GetSRV()
     {
-        return m_srv;
+        return m_srv.get();
     }
 
-}
+} // namespace Vixen

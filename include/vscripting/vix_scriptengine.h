@@ -39,8 +39,8 @@ namespace Vixen {
         virtual bool    VInitialize() = 0;
         virtual bool    VDeInitialize() = 0;
 
-		virtual ErrCode VExecuteFile(const UString& path) = 0;
-		virtual ErrCode VExecuteExpression(const UString& expression) = 0;
+		virtual ErrCode VExecuteFile(const std::string& path) = 0;
+		virtual ErrCode VExecuteExpression(const std::string& expression) = 0;
 	};
 
 }

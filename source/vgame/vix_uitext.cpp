@@ -8,12 +8,12 @@ namespace Vixen {
     UIText::UIText() 
 		: Component(Type::UI_TEXT)
     {
-        m_text = VTEXT("");
+        m_text = "";
         m_font = NULL;
 		m_parent = NULL;
     }
 
-    UIText::UIText(UString text) 
+    UIText::UIText(std::string text) 
 		: Component(Type::UI_TEXT)
     {
         m_text = text;
@@ -22,7 +22,7 @@ namespace Vixen {
     }
 
 
-    UIText::UIText(UString text, Font* font)
+    UIText::UIText(std::string text, Font* font)
 		: Component(Component::Type::UI_TEXT)
     {
         m_text = text;
@@ -37,15 +37,15 @@ namespace Vixen {
 
     void UIText::SetText(std::string text)
     {
-        m_text = UStringFromCharArray(text.c_str());
+        m_text = text.c_str();
     }
 
     std::string UIText::GetText()
     {
-        return UStringToStd(m_text);
+        return m_text;
     }
 
-    UString UIText::GetTextW()
+    std::string UIText::GetTextW()
     {
         return m_text;
     }

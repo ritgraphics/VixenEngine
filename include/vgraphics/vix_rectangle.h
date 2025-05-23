@@ -82,8 +82,8 @@ namespace Vixen {
 			return !(*this == rhs);
 		}
 
-		inline VIX_API friend UOStream& operator <<
-			(UOStream& o, const Rect& r)
+		inline VIX_API friend std::ostream& operator <<
+			(std::ostream& o, const Rect& r)
 		{
 			o << "Rectangle [ "
 				<< "X=" << r.x << " "

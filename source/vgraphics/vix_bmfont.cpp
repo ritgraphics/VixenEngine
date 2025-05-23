@@ -1,24 +1,24 @@
 /*
-	The MIT License(MIT)
+    The MIT License(MIT)
 
-	Copyright(c) 2015 Vixen Team, Matt Guerrette
+    Copyright(c) 2015 Vixen Team, Matt Guerrette
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files(the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions :
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files(the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions :
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 */
 
 #include <vix_bmfont.h>
@@ -27,30 +27,31 @@
 #include <vix_resourcemanager.h>
 #include <vix_rectangle.h>
 
-namespace Vixen {
+namespace Vixen
+{
 
-    BMFont::BMFont()
-        : Font()
+    BMFont::BMFont() : Font()
     {
-
     }
 
     BMFont::~BMFont()
     {
-		for (auto& tex : m_textures)
-			ResourceManager::DecrementAssetRef(tex);
+        for (auto& tex : m_textures)
+            ResourceManager::DecrementAssetRef(tex);
     }
 
     bool BMFont::VInitFromFile(File* file)
     {
         using namespace tinyxml2;
 
-        XMLDOC document;
-        XMLError err = document.LoadFile(file->Handle());
-        UString errString;
+        const auto bytes = file->ReadAllBytes();
+
+        XMLDOC      document;
+        XMLError    err = document.Parse((const char*)bytes.data(), bytes.size());
+        std::string errString;
         if (XMLErrCheck(err, errString))
         {
-            DebugPrintF(VTEXT("BMFont File failed to load\n"));
+            DebugPrintF("BMFont File failed to load\n");
             return false;
         }
 
@@ -61,13 +62,14 @@ namespace Vixen {
 
         for (FontChar& c : m_fontFile.chars)
         {
-            UChar _c = (UChar)c.id;
+            char _c = (char)c.id;
             m_charMap[_c] = c;
         }
 
-        for (auto& page : m_fontFile.pages) {
-            UString texturePath = page.file;
-            Texture* texture = ResourceManager::OpenTexture(texturePath);
+        for (auto& page : m_fontFile.pages)
+        {
+            std::string texturePath = page.file;
+            Texture*    texture = ResourceManager::OpenTexture(texturePath);
             if (texture)
                 m_textures.push_back(texture);
         }
@@ -83,7 +85,7 @@ namespace Vixen {
         return m_textures[index];
     }
 
-    bool BMFont::VFindChar(UChar c, FontChar& fontChar)
+    bool BMFont::VFindChar(char c, FontChar& fontChar)
     {
         Font::CharMap::iterator it = m_charMap.find(c);
         if (it != m_charMap.end())
@@ -100,37 +102,37 @@ namespace Vixen {
         return m_fontFile.common.lineHeight;
     }
 
+    Rect BMFont::VBounds(std::string text)
+    {
+        Rect bounds;
+        int  dx = 0;
+        int  lineH = m_fontFile.common.lineHeight;
+        int  dy = lineH;
+        /*Iterate over characters in text*/
+        for (const char& c : text)
+        {
+            if (c == '\n')
+            {
+                dx = 0;
+                dy += lineH;
+            }
 
-	Rect BMFont::VBounds(UString text)
-	{
-		Rect bounds;
-		int dx = 0;
-		int lineH = m_fontFile.common.lineHeight;
-		int dy = lineH;
-		/*Iterate over characters in text*/
-		for (const UChar& c : text)
-		{
-			if (c == '\n') {
-				dx = 0;
-				dy += lineH;
-			}
+            // Find the font character and advance the
+            // pixel units based on the xAdvance value
+            FontChar fc;
+            if (VFindChar(c, fc))
+            {
+                dx += fc.xAdvance;
+            }
+        }
 
-			//Find the font character and advance the
-			//pixel units based on the xAdvance value
-			FontChar fc;
-			if (VFindChar(c, fc)) {
-				dx += fc.xAdvance;
-			}
-		}
+        bounds.x = 0;
+        bounds.y = 0;
+        bounds.w = dx;
+        bounds.h = dy;
 
-		bounds.x = 0;
-		bounds.y = 0;
-		bounds.w = dx;
-		bounds.h = dy;
-
-		return bounds;
-	}
-
+        return bounds;
+    }
 
     void BMFont::ReadFontInfo(XMLDOC& doc, BMFontFile& file)
     {
@@ -145,19 +147,12 @@ namespace Vixen {
         const char* _charset = infoElement->Attribute("charset");
         const char* _padding = infoElement->Attribute("padding");
         const char* _spacing = infoElement->Attribute("spacing");
-        UString spacing;
-#ifdef UNICODE
-        UConverter cv;
-        info.face = cv.from_bytes(_face);
-        info.charset = cv.from_bytes(_charset);
-        info.padding = cv.from_bytes(_padding);
-        spacing = cv.from_bytes(_spacing);
-#else
+        std::string spacing;
+
         info.face = _face;
         info.charset = _charset;
         info.padding = _padding;
         spacing = _spacing;
-#endif
         info.size = infoElement->IntAttribute("size");
         info.bold = infoElement->IntAttribute("bold");
         info.italic = infoElement->IntAttribute("italic");
@@ -203,11 +198,11 @@ namespace Vixen {
         using namespace tinyxml2;
         XMLElement* fontElement = doc.FirstChildElement("font");
         XMLElement* charsElement = fontElement->FirstChildElement("chars");
-        int count = charsElement->IntAttribute("count");
+        int         count = charsElement->IntAttribute("count");
 
         /*Populate font file chars collection*/
         std::vector<FontChar>& chars = file.chars;
-        XMLElement* charElement = charsElement->FirstChildElement("char");
+        XMLElement*            charElement = charsElement->FirstChildElement("char");
         for (int i = 0; i < count; i++)
         {
 
@@ -237,23 +232,17 @@ namespace Vixen {
 
         /*Populate font file pages collection*/
         std::vector<BMFontPage>& pages = file.pages;
-        XMLElement* pageElement = pagesElement->FirstChildElement("page");
+        XMLElement*              pageElement = pagesElement->FirstChildElement("page");
         while (pageElement)
         {
             BMFontPage p;
             p.id = pageElement->IntAttribute("id");
             const char* _file = pageElement->Attribute("file");
-
-#ifdef UNICODE
-            UConverter cv;
-            p.file = cv.from_bytes(_file);
-#else
             p.file = _file;
-#endif
             pages.push_back(p);
 
             /*Try and move to next page element*/
             pageElement = pageElement->NextSiblingElement("page");
         }
     }
-}
+} // namespace Vixen

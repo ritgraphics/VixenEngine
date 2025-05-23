@@ -67,7 +67,7 @@ namespace Vixen {
 	struct TMXImageInfo
 	{
 		TMXImgFormat	format;		//EXT. FOR EMBEDDED IMAGES
-		UString			source;		//Path reference to tileset image file
+		std::string			source;		//Path reference to tileset image file
 		size_t			width;		//Width of image in pixels  (optional)
 		size_t			height;		//Height of image in pixels (optional)
 	};
@@ -75,7 +75,7 @@ namespace Vixen {
 	struct TMXTilesetInfo
 	{
 		int		globalID;	//first global tile ID (maps to FIRST tile)
-		UString name;		//name
+		std::string name;		//name
 		size_t  width;		//maximum width of tiles
 		size_t  height;		//maximum height of tiles
 		size_t  spacing;	//spacing in pixels between tiles
@@ -91,7 +91,7 @@ namespace Vixen {
 	class VIX_API TMXLayer
 	{
 	public:
-		TMXLayer(const UString& name,
+		TMXLayer(const std::string& name,
 					   size_t	width,
 					   size_t	height,
 					   float	opacity,
@@ -105,7 +105,7 @@ namespace Vixen {
 		int				GetTileID(int row, int col);
 
 	private:
-		UString		m_name;		//layer name
+		std::string		m_name;		//layer name
 		size_t		m_width;	//width in TILES
 		size_t		m_height;	//height in TILES
 		float		m_opacity;	//opacity of layer (0 - 1)
@@ -119,7 +119,7 @@ namespace Vixen {
 		TMXMap(void);
 
 
-		static void FromFile(const UString& file, TMXMap& map);
+		static void FromFile(const std::string& file, TMXMap& map);
 	private:
 		TMXMapInfo m_info;
 		TMXLayer*  m_layers;

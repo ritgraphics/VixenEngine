@@ -40,7 +40,7 @@ namespace Vixen {
 		void    Toggle();
 		void    Show();
 		void    Hide();
-		UString Buffer();
+		std::string Buffer();
 		void	Write(const char* text, size_t len);
 		void	Erase(size_t len);
 		void    Render(IRenderer* renderer, int x, int y);

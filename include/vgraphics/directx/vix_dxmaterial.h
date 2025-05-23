@@ -53,11 +53,11 @@ namespace Vixen {
 
 		bool VInitFromFile(File* file);
 
-		UString VFilePath();
+		std::string VFilePath();
 
     private:
         std::map<ShaderRole,  DXShader*>		m_shaders;
-		UString									m_path;
+		std::string									m_path;
 
 	private:
     };

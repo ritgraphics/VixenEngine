@@ -37,15 +37,15 @@ namespace Vixen {
         STLMAP_DELETE(m_fonts);
 	}
 
-  BMFont* ContentManager::LoadFont(const UString& path)
+  BMFont* ContentManager::LoadFont(const std::string& path)
   {
     	if (path.empty()) {
 	  DebugPrintF(VTEXT("Error Loading [BMFont]"));
 			return NULL;
 		}
 
-		UString _path = os_path(FONT_FOLDER_PATH + path);
-		UString _texPath = os_path(FONT_FOLDER_PATH + TEX_FOLDER_PATH);
+		std::string _path = os_path(FONT_FOLDER_PATH + path);
+		std::string _texPath = os_path(FONT_FOLDER_PATH + TEX_FOLDER_PATH);
 
 		ContentMap::iterator it = m_fonts.find(_path);
 		if (it != m_fonts.end()) {
@@ -68,14 +68,14 @@ namespace Vixen {
 		return NULL;
   }
 
-  Texture* ContentManager::LoadTexture(const UString& path)
+  Texture* ContentManager::LoadTexture(const std::string& path)
   {
     	if (path.empty()) {
 	  DebugPrintF(VTEXT("Error Loading [Texture]"));
 			return NULL;
 		}
 
-		UString _path = os_path(TEX_FOLDER_PATH + path);
+		std::string _path = os_path(TEX_FOLDER_PATH + path);
 
 		ContentMap::iterator it = m_textures.find(_path);
 		if (it != m_textures.end()) {

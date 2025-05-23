@@ -55,8 +55,8 @@ namespace Vixen {
 		void SetCenter(const Vec3& center);
 		void SetTexture(GLTexture* tex);
 		void SetInitialized(bool initialized);
-		void SetDiffusePath(UString path);
-		void SetBumpPath(UString path);
+		void SetDiffusePath(std::string path);
+		void SetBumpPath(std::string path);
 		void SetRotation(Vec3 rot);
 
 		/*GETTERS*/
@@ -75,21 +75,21 @@ namespace Vixen {
 		GLTexture*		    GetTexture() const;
 		GLTexture*          GetBump() const;
 		VertexCollection    GetVertices();
-		UString             GetDiffusePath();
-		UString             GetBumpPath();
+		std::string             GetDiffusePath();
+		std::string             GetBumpPath();
 		bool                IsInitialized();
 
 		/*Render Model*/
 		void Render(GLCamera3D* camera);
 
-		void InitFromFile(UString filePath, ModelInit initMode = ModelInit::UNTHREADED);
+		void InitFromFile(std::string filePath, ModelInit initMode = ModelInit::UNTHREADED);
 		void InitMesh(const aiMesh* mesh);
 
 
 	private:
 		void init_shader_program();
-		void init_model(UString filePath);
-		static void InitModelThreaded(Model* model, UString filePath);
+		void init_model(std::string filePath);
+		static void InitModelThreaded(Model* model, std::string filePath);
 
 	private:
 		AABB*               m_aabb;
@@ -104,8 +104,8 @@ namespace Vixen {
 		Vec3                m_size;
 		Vec3                m_centroid;
 		GLShaderProgram*	m_program;
-		UString             m_diffusePath;
-		UString             m_bumpPath;
+		std::string             m_diffusePath;
+		std::string             m_bumpPath;
 		GLTexture*          m_texture;
 		GLTexture*          m_bump;
 		bool				m_initialized;

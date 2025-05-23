@@ -81,24 +81,20 @@ namespace Vixen {
 		/* Initialize SDL
 		*/
 		if (!SDL_Init(SDL_INIT_EVENTS | SDL_INIT_GAMEPAD)) {
-			DebugPrintF(VTEXT("SDL Failed to Initialize"));
+			DebugPrintF("SDL Failed to Initialize");
             return false;
 		}
 
 		/*Create the SDL_Window handle*/
-#ifdef UNICODE
-		UConverter convert;
-		std::string title = convert.to_bytes(m_params.title);
-#else
+
 		std::string title = m_params.title;
-#endif
 		m_windowHandle = SDL_CreateWindow(title.c_str(),
 											m_params.width,
 											m_params.height,
 											 SDL_WINDOW_RESIZABLE);
 		if (!m_windowHandle) {
 			SDL_Quit();
-			DebugPrintF(VTEXT("Failed to created SDL_Window handle"));
+			DebugPrintF("Failed to created SDL_Window handle");
             return false;
 		}
 
@@ -302,7 +298,7 @@ namespace Vixen {
         SDL_SetWindowTitle(m_windowHandle, title.c_str());
     }
 
-	const UString& SDLGameWindow::VGetTitle()
+	const std::string& SDLGameWindow::VGetTitle()
 	{
 		return m_title;
 	}

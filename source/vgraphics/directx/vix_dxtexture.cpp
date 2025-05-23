@@ -89,7 +89,7 @@ namespace Vixen {
         hr = m_device->CreateTexture2D(&desc, &subTexData, &tex);
         if (FAILED(hr))
         {
-            DebugPrintF(VTEXT("FAILED TO CREATE TEXTURE"));
+            DebugPrintF("FAILED TO CREATE TEXTURE");
             return false;
         }
         

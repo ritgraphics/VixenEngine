@@ -35,7 +35,7 @@ namespace Vixen {
     {
     public:
 		static void Initialize();
-        static LuaScript* LoadScript(UString name);
+        static LuaScript* LoadScript(std::string name);
 		static LuaIntf::LuaRef* s_thisTable;
 
 		static void PushScript(LuaScript* script);

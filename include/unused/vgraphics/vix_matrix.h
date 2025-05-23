@@ -75,10 +75,10 @@ namespace Vixen {
 		//static members
 		static const Matrix Identity;
 
-		UString ToString() const;
+		std::string ToString() const;
 
-		inline VIX_API friend UOStream& operator <<
-			(UOStream& o, const Matrix& m)
+		inline VIX_API friend std::ostream& operator <<
+			(std::ostream& o, const Matrix& m)
 		{
 			o << "Matrix\n"
 				<< m.ToString();
@@ -92,9 +92,9 @@ namespace Vixen {
 						float m41, float m42, float m43, float m44);
 	};
 
-	inline UString Matrix::ToString() const
+	inline std::string Matrix::ToString() const
 	{
-		USStream ss;
+		std::stringstream ss;
 		ss  << std::fixed
 			<< std::setprecision(3)
 			<< "[ " << m[0][0] << ", " << m[0][1] << ", " << m[0][2] << ", " << m[0][3] << "]\n"

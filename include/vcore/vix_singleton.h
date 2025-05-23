@@ -33,9 +33,15 @@
 namespace Vixen {
 
 	template <typename T>
-	class VIX_API Singleton : private INonCopy
+	class VIX_API Singleton
 	{
 	public:
+		explicit Singleton<T>() { }
+        Singleton(const Singleton&) = delete;
+        Singleton& operator=(const Singleton&) = delete;
+        Singleton(Singleton&&) = delete;
+        Singleton& operator=(Singleton&&) = delete;
+
 		static T& instance()
 		{
 			static T _instance;
@@ -43,8 +49,6 @@ namespace Vixen {
 			return _instance;
 		}
 
-	protected:
-		explicit Singleton<T>() { }
 
 	};
 }

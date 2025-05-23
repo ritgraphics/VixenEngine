@@ -8,15 +8,15 @@ namespace Vixen {
 	{
 		LightManager& _manager = LightManager::instance();
 
-		_manager.m_pointLightModel = ResourceManager::OpenModel(VTEXT("pointlight.obj"));
+		_manager.m_pointLightModel = ResourceManager::OpenModel("pointlight.obj");
 		_manager.m_pointLightModel->IncrementRefCount();
-		_manager.m_pointLightMaterial = ResourceManager::OpenMaterial(VTEXT("PointLight.vmt"));
+		_manager.m_pointLightMaterial = ResourceManager::OpenMaterial("PointLight.vmt");
 		_manager.m_pointLightMaterial->IncrementRefCount();
 		_manager.m_pointLightModel->VSetMaterial(_manager.m_pointLightMaterial);
 
-		_manager.m_spotLightModel = ResourceManager::OpenModel(VTEXT("spotlight.obj"));
+		_manager.m_spotLightModel = ResourceManager::OpenModel("spotlight.obj");
 		_manager.m_spotLightModel->IncrementRefCount();
-		_manager.m_spotLightMaterial = ResourceManager::OpenMaterial(VTEXT("SpotLight.vmt"));
+		_manager.m_spotLightMaterial = ResourceManager::OpenMaterial("SpotLight.vmt");
 		_manager.m_spotLightMaterial->IncrementRefCount();
 		_manager.m_spotLightModel->VSetMaterial(_manager.m_spotLightMaterial);
 	}

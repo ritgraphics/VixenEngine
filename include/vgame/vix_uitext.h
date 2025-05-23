@@ -14,8 +14,8 @@ namespace Vixen {
     {
     public:
         UIText();
-        UIText(UString text);
-        UIText(UString text, Font* font);
+        UIText(std::string text);
+        UIText(std::string text, Font* font);
 
         ~UIText();
 
@@ -28,13 +28,13 @@ namespace Vixen {
 		void VBindParent(GameObject* parent);
 
         std::string GetText();
-        UString     GetTextW();
+        std::string     GetTextW();
         void        SetText(std::string text);
 
         Font*       GetFont();
 
     private:
-        UString     m_text;
+        std::string     m_text;
         Font*       m_font;
 		GameObject* m_parent;
     };

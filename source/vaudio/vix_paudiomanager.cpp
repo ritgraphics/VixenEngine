@@ -50,7 +50,7 @@ namespace Vixen {
 		PAUDIO_Init();
 	}
 
-	void PAudioManager::Load(const UString& file)
+	void PAudioManager::Load(const std::string& file)
 	{
 		std::string path = Vixen::UStringToStd(file);
 		SNDFILE_DATA* data = SNDFILE_ReadFile(path.c_str());

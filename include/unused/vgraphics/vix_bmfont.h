@@ -52,22 +52,22 @@ namespace Vixen {
 		int page;
 		int channel;
 
-		friend UOStream& operator << (UOStream& o, const BMFontChar& c);
+		friend std::ostream& operator << (std::ostream& o, const BMFontChar& c);
 	};
 
 
 	struct VIX_API BMFontInfo
 	{
-		UString    face;
+		std::string    face;
 		int            size;
 		int            bold;
 		int            italic;
-		UString    charset;
+		std::string    charset;
 		int            unicode;
 		int            stretchH;
 		int            smooth;
 		int            antiAliasing;
-		UString    padding;
+		std::string    padding;
 		int            padX;
 		int            padY;
 		int            padW;
@@ -76,7 +76,7 @@ namespace Vixen {
 		int            spacingY;
 		int            outline;
 
-		friend VIX_API UOStream& operator << (UOStream& o, const BMFontInfo& i);
+		friend VIX_API std::ostream& operator << (std::ostream& o, const BMFontInfo& i);
 	};
 
 
@@ -93,7 +93,7 @@ namespace Vixen {
 		int greenChannel;
 		int blueChannel;
 
-		friend VIX_API UOStream& operator << (UOStream& o, const BMFontCommon& c);
+		friend VIX_API std::ostream& operator << (std::ostream& o, const BMFontCommon& c);
 	};
 
 
@@ -101,9 +101,9 @@ namespace Vixen {
 	struct VIX_API BMFontPage
 	{
 		int         id;
-		UString     file;
+		std::string     file;
 
-		friend VIX_API UOStream& operator << (UOStream& o, const BMFontPage& p);
+		friend VIX_API std::ostream& operator << (std::ostream& o, const BMFontPage& p);
 	};
 
 
@@ -113,21 +113,21 @@ namespace Vixen {
 		int  second;
 		int  amount;
 
-		friend VIX_API UOStream& operator << (UOStream& o, const BMFontKerning& k);
+		friend VIX_API std::ostream& operator << (std::ostream& o, const BMFontKerning& k);
 	};
 
 
 
 	struct VIX_API BMFontFile
 	{
-		UString                     file;
+		std::string                     file;
 		BMFontInfo                  info;
 		BMFontCommon                common;
 		std::vector<BMFontPage>     pages;
 		std::vector<BMFontChar>     chars;
 		std::vector<BMFontKerning>  kernings;
 
-		UString ToString() const;
+		std::string ToString() const;
 	};
 
 
@@ -141,7 +141,7 @@ namespace Vixen {
 	*/
 	class VIX_API BMFont
 	{
-		typedef std::map<UChar, BMFontChar>    BMCharMap;
+		typedef std::map<char, BMFontChar>    BMCharMap;
 
 	public:
 		/*Constructor for BMFont*/
@@ -157,15 +157,15 @@ namespace Vixen {
 		Texture* const PageTexture(size_t index) const;
 
 		/*Functions*/
-		Rectangle  Bounds(const UString& text);
+		Rectangle  Bounds(const std::string& text);
 
 		void Load();
 
 
-		friend UOStream& operator << (UOStream& o, const BMFont& font);
+		friend std::ostream& operator << (std::ostream& o, const BMFont& font);
 
 		/*Find font character in char map*/
-		bool FindChar(UChar c, BMFontChar& fc);
+		bool FindChar(char c, BMFontChar& fc);
 
 		/*Initialize Textures*/
 		void InitTextures();
@@ -181,7 +181,7 @@ namespace Vixen {
 		BMFontFile LoadFile(File* file);
 
 		/*Adds a bitmap to the font page bitmap collection*/
-		void LoadPageBitmap(const UString filePath);
+		void LoadPageBitmap(const std::string filePath);
 
 		/*Adds a texture to the font page tex collection*/
 		void AddPageTexture(Texture* texture);
@@ -202,7 +202,7 @@ namespace Vixen {
 	};
 
 
-	inline UOStream& operator << (UOStream& o, const BMFont& font)
+	inline std::ostream& operator << (std::ostream& o, const BMFont& font)
 	{
 		/*Will fail if UNICODE and outputting to console window without UTF-8 locale set*/
 		o << font.FontFile().ToString();

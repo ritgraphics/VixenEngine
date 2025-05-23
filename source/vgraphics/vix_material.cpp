@@ -135,7 +135,7 @@ namespace Vixen {
 				std::string key = shaderChild->Attribute("name");
 				std::string fileName = shaderChild->Attribute("file");
 
-				Texture* texture = ResourceManager::OpenTexture(UStringFromCharArray(fileName.c_str()));
+				Texture* texture = ResourceManager::OpenTexture(fileName.c_str());
 				if (!texture) {
 					return false;
 				}

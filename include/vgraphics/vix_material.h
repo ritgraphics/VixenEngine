@@ -64,7 +64,7 @@ namespace Vixen {
         virtual void VBind() = 0;
         virtual void VUnbind() = 0; 
 
-		virtual UString VFilePath() = 0;
+		virtual std::string VFilePath() = 0;
 		
 		void SetShaderVariableFloat(ShaderRole shader, std::string name, float val);
 		void SetShaderVariableFloat4(ShaderRole shader, std::string name, float x, float y, float z, float w);

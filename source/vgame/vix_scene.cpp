@@ -1,24 +1,24 @@
 /*
-	The MIT License(MIT)
+    The MIT License(MIT)
 
-	Copyright(c) 2015 Vixen Team, Matt Guerrette
+    Copyright(c) 2015 Vixen Team, Matt Guerrette
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files(the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions :
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files(the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions :
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 */
 
 #include <vix_scene.h>
@@ -39,405 +39,398 @@
 #include <vix_window_singleton.h>
 #include <vix_renderer_singleton.h>
 
-namespace Vixen {
+namespace Vixen
+{
 
+    /////////////////////////////////////////////////
+    // Scene implementation
+    /////////////////////////////////////////////////
 
+    Scene::Scene()
+    {
+        m_paused = false;
+        m_hidden = false;
 
-	/////////////////////////////////////////////////
-	// Scene implementation
-	/////////////////////////////////////////////////
+        m_mainCamera = NULL;
+    }
 
-	Scene::Scene()
-	{
-		m_paused = false;
-		m_hidden = false;
-		
-		m_mainCamera = NULL;
-	}
+    Scene::~Scene()
+    {
+        if (m_topLevelObjects.size() > 0)
+            STLVEC_DELETE(m_topLevelObjects);
+    }
 
-	Scene::~Scene()
-	{
-		if (m_topLevelObjects.size() > 0)
-			STLVEC_DELETE(m_topLevelObjects);
-	}
+    void Scene::AddSceneObject(GameObject* object)
+    {
+        m_topLevelObjects.push_back(object);
+    }
 
-	void Scene::AddSceneObject(GameObject* object)
-	{
-		m_topLevelObjects.push_back(object);
-	}
+    void Scene::RemoveSceneObject(GameObject* object)
+    {
+        for (int i = 0; i < m_topLevelObjects.size(); i++)
+        {
+            if (m_topLevelObjects.at(i) == object)
+            {
+                m_topLevelObjects.erase(m_topLevelObjects.begin() + i);
+                return;
+            }
+        }
+    }
 
-	void Scene::RemoveSceneObject(GameObject* object)
-	{
-		for (int i = 0; i < m_topLevelObjects.size(); i++)
-		{
-			if (m_topLevelObjects.at(i) == object)
-			{
-				m_topLevelObjects.erase(m_topLevelObjects.begin() + i);
-				return;
-			}
-		}
-	}
+    void Scene::Update()
+    {
+        // update all scene objects
+        for (int i = 0; i < m_topLevelObjects.size(); i++)
+        {
+            GameObject* obj = m_topLevelObjects.at(i);
+            if (obj->IsMarkedForDestroy())
+            {
+                // destroy the object and skip over the index
+                ObjectManager::DestroyGameObject(obj);
+                m_topLevelObjects.erase(m_topLevelObjects.begin() + i);
+                i--;
+            }
+            else if (obj->GetEnabled())
+                obj->Update();
+        }
+    }
 
+    void Scene::Render()
+    {
 
-	void Scene::Update()
-	{
-		//update all scene objects
-		for (int i = 0; i < m_topLevelObjects.size(); i++)
-		{
-			GameObject* obj = m_topLevelObjects.at(i);
-			if(obj->IsMarkedForDestroy())
-			{
-				//destroy the object and skip over the index
-				ObjectManager::DestroyGameObject(obj);
-				m_topLevelObjects.erase(m_topLevelObjects.begin() + i);
-				i--;
-			}
-			else if (obj->GetEnabled())
-				obj->Update();
-		}
-	}
+        // For each camera in the scene, we need to render all geometry and
+        // ui elements, twice. One for each camera viewport
 
-	void Scene::Render()
-	{
-		
+        for (int i = 0; i < m_cameras.size(); i++)
+        {
 
-		//For each camera in the scene, we need to render all geometry and 
-		//ui elements, twice. One for each camera viewport
+            ICamera3D* camera = m_cameras[i];
 
-		for (int i = 0; i < m_cameras.size(); i++)
-		{
+            // render all scene object
+            for (int i = 0; i < m_topLevelObjects.size(); i++)
+            {
+                GameObject* obj = m_topLevelObjects.at(i);
+                if (!obj->IsMarkedForDestroy() && !obj->IsMarkedForLateRender() && obj->GetEnabled())
+                    obj->Render(camera);
+            }
 
-			ICamera3D* camera = m_cameras[i];
+            Renderer::RenderDeferred();
 
-			//render all scene object
-			for (int i = 0; i < m_topLevelObjects.size(); i++)
-			{
-				GameObject* obj = m_topLevelObjects.at(i);
-				if (!obj->IsMarkedForDestroy() && !obj->IsMarkedForLateRender() && obj->GetEnabled())
-					obj->Render(camera);
-			}
+            std::map<std::string, Model*>& models = ResourceManager::LoadedModels();
+            for (auto& model : models)
+            {
+                if (model.second)
+                    if (model.first != "pointlight.obj" && model.first != "spotlight.obj")
+                        model.second->VRender(Time::DeltaTime(), Time::TotalTime(), camera);
+            }
 
-			Renderer::RenderDeferred();
+            // Render all lights in scene
 
-			std::map<UString, Model*>& models = ResourceManager::LoadedModels();
-			for (auto& model : models)
-			{
-				if (model.second)
-					if(model.first != L"pointlight.obj" && model.first != L"spotlight.obj")
-						model.second->VRender(Time::DeltaTime(), Time::TotalTime(), camera);
-			}
+            LightManager::RenderLights(camera);
 
-			//Render all lights in scene
+            Renderer::RenderFinal();
 
-			LightManager::RenderLights(camera);
-			
-			Renderer::RenderFinal();
+            LightManager::ClearLights();
 
+            // render all late render (UI) scene objects
+            // NOTE: this is expensive, as we are iterating over the list of objects again...
+            //       what should happen is the list should be sorted once, leaving all late render objects
+            //       last to be drawn.
+            for (int i = 0; i < m_topLevelObjects.size(); i++)
+            {
+                GameObject* obj = m_topLevelObjects.at(i);
+                if (obj->IsMarkedForLateRender() && obj->GetEnabled())
+                    obj->Render(camera);
+            }
+        }
 
-			LightManager::ClearLights();
+        LuaEngine::ExecuteExpression("collectgarbage()");
+    }
 
-			//render all late render (UI) scene objects
-			//NOTE: this is expensive, as we are iterating over the list of objects again...
-			//      what should happen is the list should be sorted once, leaving all late render objects
-			//      last to be drawn.
-			for (int i = 0; i < m_topLevelObjects.size(); i++)
-			{
-				GameObject* obj = m_topLevelObjects.at(i);
-				if (obj->IsMarkedForLateRender() && obj->GetEnabled())
-					obj->Render(camera);
-			}
-		}
+    GameObject* Scene::QueryObject(std::string name)
+    {
+        for (int i = 0; i < m_topLevelObjects.size(); i++)
+        {
+            GameObject* _object = m_topLevelObjects[i];
+            if (_object->GetName() == name)
+                return _object;
+        }
 
-		
+        return NULL;
+    }
 
-		LuaEngine::ExecuteExpression(VTEXT("collectgarbage()"));
-	}
+    /*SETTER FUNCTIONS*/
 
-	GameObject* Scene::QueryObject(std::string name)
-	{
-		for (int i = 0; i < m_topLevelObjects.size(); i++)
-		{
-			GameObject* _object = m_topLevelObjects[i];
-			if (_object->GetName() == name)
-				return _object;
-		}
+    void Scene::SetID(std::string id)
+    {
+        m_id = id;
+    }
 
-		return NULL;
-	}
+    void Scene::SetFileName(std::string name)
+    {
+        m_fileName = name;
+    }
 
-	/*SETTER FUNCTIONS*/
+    void Scene::SetMainCamera(ICamera3D* camera)
+    {
+        m_mainCamera = camera;
+    }
 
-	void Scene::SetID(std::string id)
-	{
-		m_id = id;
-	}
+    void Scene::AddCamera(ICamera3D* camera)
+    {
+        m_cameras.push_back(camera);
+    }
 
-	void Scene::SetFileName(std::string name)
-	{
-		m_fileName = name;
-	}
+    void Scene::RemoveCamera(ICamera3D* camera)
+    {
+        for (int i = 0; i < m_cameras.size(); i++)
+        {
+            if (m_cameras[i] == camera)
+            {
+                m_cameras.erase(m_cameras.begin() + i);
+                return;
+            }
+        }
+    }
 
-	void Scene::SetMainCamera(ICamera3D * camera)
-	{
-		m_mainCamera = camera;
-	}
+    void Scene::SetPaused(bool paused)
+    {
+        m_paused = paused;
+    }
 
-	void Scene::AddCamera(ICamera3D * camera)
-	{
-		m_cameras.push_back(camera);
-	}
+    void Scene::SetHidden(bool hidden)
+    {
+        m_hidden = hidden;
+    }
 
-	void Scene::RemoveCamera(ICamera3D * camera)
-	{
-		for (int i = 0; i < m_cameras.size(); i++)
-		{
-			if (m_cameras[i] == camera)
-			{
-				m_cameras.erase(m_cameras.begin() + i);
-				return;
-			}
-		}
-	}
+    /*GETTER FUNCTIONS*/
+    const std::string& Scene::GetID()
+    {
+        return m_id;
+    }
 
-	void Scene::SetPaused(bool paused)
-	{
-		m_paused = paused;
-	}
+    const std::string& Scene::GetFileName()
+    {
+        return m_fileName;
+    }
 
-	void Scene::SetHidden(bool hidden)
-	{
-		m_hidden = hidden;
-	}
+    bool Scene::IsPaused()
+    {
+        return m_paused;
+    }
 
+    bool Scene::IsHidden()
+    {
+        return m_hidden;
+    }
 
+    ///////////////////////////////////////////////////////////////////////
+    // STATIC FUNCTIONS
+    ///////////////////////////////////////////////////////////////////////
 
-	/*GETTER FUNCTIONS*/
-	const std::string& Scene::GetID()
-	{
-		return m_id;
-	}
+    Scene* Scene::Deserialize(File* file)
+    {
 
-	const std::string& Scene::GetFileName()
-	{
-		return m_fileName;
-	}
+        using namespace tinyxml2;
 
-	bool Scene::IsPaused()
-	{
-		return m_paused;
-	}
+        const auto bytes = file->ReadAllBytes();
 
-	bool Scene::IsHidden()
-	{
-		return m_hidden;
-	}
+        // File is actually an XML file
+        // we should now open for reading
+        XMLDOC      document;
+        XMLError    err = document.Parse((const char*)bytes.data(), bytes.size());
+        std::string errString;
+        if (XMLErrCheck(err, errString))
+        {
+            DebugPrintF("Scene File failed to load\n");
+            return NULL;
+        }
 
-	
+        Scene* _scene = new Scene;
+        SceneManager::AddScene(_scene);
 
+        const XMLElement* sceneElement = document.FirstChildElement("scene");
+        const XMLElement* objectListElement = sceneElement->FirstChildElement("object-list");
+        const XMLElement* gameObjectElement = objectListElement->FirstChildElement("gameobject");
+        const char*       sceneID = sceneElement->Attribute("id");
+        _scene->SetID(sceneID);
+        while (gameObjectElement != NULL)
+        {
+            GameObject* _gameObject = ParseGameObject(_scene, gameObjectElement);
 
-	///////////////////////////////////////////////////////////////////////
-	// STATIC FUNCTIONS
-	///////////////////////////////////////////////////////////////////////
+            _scene->AddSceneObject(_gameObject);
 
-	Scene* Scene::Deserialize(File* file)
-	{
+            gameObjectElement = gameObjectElement->NextSiblingElement("gameobject");
+        }
 
-		using namespace tinyxml2;
+        /////////////////////////////////////////////////////
+        // temporary until objects have their enabled status serialized
+        //////////////////////////////////////////
+        /*for (auto& obj : _scene->m_sceneObjects)
+            obj.second->SetEnabled(true, true);
+        */
+        return _scene;
+    }
 
-		//File is actually an XML file
-		//we should now open for reading
-		XMLDOC document;
-		XMLError err = document.LoadFile(file->Handle());
-		UString errString;
-		if (XMLErrCheck(err, errString))
-		{
-			DebugPrintF(VTEXT("Scene File failed to load\n"));
-			return NULL;
-		}
+    GameObject* Scene::ParseGameObject(Scene* scene, const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		Scene* _scene = new Scene;
-		SceneManager::AddScene(_scene);
+        const char* objectName = element->Attribute("name");
+        const bool  enabled = element->BoolAttribute("enabled");
 
-		const XMLElement* sceneElement = document.FirstChildElement("scene");
-		const XMLElement* objectListElement = sceneElement->FirstChildElement("object-list");
-		const XMLElement* gameObjectElement = objectListElement->FirstChildElement("gameobject");
-		const char* sceneID = sceneElement->Attribute("id");
-		_scene->SetID(sceneID);
-		while (gameObjectElement != NULL)
-		{
-			GameObject* _gameObject = ParseGameObject(_scene, gameObjectElement);
+        Transform* transform = ParseTransform(element->FirstChildElement("transform"));
 
-			_scene->AddSceneObject(_gameObject);
+        const XMLElement* model = element->FirstChildElement("model");
+        std::string       modelFile = "";
+        if (model)
+        {
+            modelFile = model->Attribute("file");
+        }
 
-			gameObjectElement = gameObjectElement->NextSiblingElement("gameobject");
-		}
+        GameObject* _object = new GameObject(transform);
+        _object->SetName(objectName);
+        _object->SetEnabled(enabled, false);
+        ObjectManager::MapSceneObject(_object);
 
-		/////////////////////////////////////////////////////
-		// temporary until objects have their enabled status serialized
-		//////////////////////////////////////////
-		/*for (auto& obj : _scene->m_sceneObjects)
-			obj.second->SetEnabled(true, true);
-		*/
-		return _scene;
-	}
+        std::vector<Component*> components = ParseComponents(scene, element->FirstChildElement("components"));
+        for (auto& component : components)
+        {
+            component->VBindParent(_object);
+            _object->AddComponent(component);
+        }
 
-	GameObject* Scene::ParseGameObject(Scene* scene, const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+        // PARSE CHILD OBJECTS OBJECTS
+        const XMLElement* children = element->FirstChildElement("children");
+        if (children)
+        {
+            const XMLElement* objectElement = children->FirstChildElement("gameobject");
+            while (objectElement != NULL)
+            {
+                GameObject* _child = ParseGameObject(scene, objectElement);
+                _object->AddChild(_child);
+                objectElement = objectElement->NextSiblingElement("gameobject");
+            }
+        }
 
-		const char* objectName = element->Attribute("name");
-		const bool enabled = element->BoolAttribute("enabled");
+        return _object;
+    }
 
-		Transform * transform = ParseTransform(element->FirstChildElement("transform"));
+    Transform* Scene::ParseTransform(const tinyxml2::XMLElement* element)
+    {
+        if (!element)
+            return nullptr;
+        float posX = element->FloatAttribute("x");
+        float posY = element->FloatAttribute("y");
+        float posZ = element->FloatAttribute("z");
+        float rotX = element->FloatAttribute("rotX");
+        float rotY = element->FloatAttribute("rotY");
+        float rotZ = element->FloatAttribute("rotZ");
+        float scaleX = element->FloatAttribute("scaleX");
+        float scaleY = element->FloatAttribute("scaleY");
+        float scaleZ = element->FloatAttribute("scaleZ");
+        return new Transform(posX, posY, posZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ);
+    }
 
-		const XMLElement* model = element->FirstChildElement("model");
-		std::string modelFile = "";
-		if (model) {
-			modelFile = model->Attribute("file");
-		}
+    std::vector<Component*> Scene::ParseComponents(Scene* scene, const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		GameObject* _object = new GameObject(transform);
-		_object->SetName(UStringFromCharArray(objectName));
-		_object->SetEnabled(enabled, false);
-		ObjectManager::MapSceneObject(_object);
+        std::vector<Component*> components;
 
-		std::vector<Component*> components = ParseComponents(scene, element->FirstChildElement("components"));
-		for (auto& component : components)
-		{
-			component->VBindParent(_object);
-			_object->AddComponent(component);
-		}
-
-		//PARSE CHILD OBJECTS OBJECTS
-		const XMLElement* children = element->FirstChildElement("children");
-		if (children)
-		{
-			const XMLElement* objectElement = children->FirstChildElement("gameobject");
-			while (objectElement != NULL)
-			{
-				GameObject* _child = ParseGameObject(scene, objectElement);
-				_object->AddChild(_child);
-				objectElement = objectElement->NextSiblingElement("gameobject");
-			}
-
-		}
-
-		return _object;
-	}
-
-	Transform* Scene::ParseTransform(const tinyxml2::XMLElement * element)
-	{
-		if (!element)
-			return nullptr;
-		float posX = element->FloatAttribute("x");
-		float posY = element->FloatAttribute("y");
-		float posZ = element->FloatAttribute("z");
-		float rotX = element->FloatAttribute("rotX");
-		float rotY = element->FloatAttribute("rotY");
-		float rotZ = element->FloatAttribute("rotZ");
-		float scaleX = element->FloatAttribute("scaleX");
-		float scaleY = element->FloatAttribute("scaleY");
-		float scaleZ = element->FloatAttribute("scaleZ");
-		return new Transform(posX, posY, posZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ);
-	}
-
-	std::vector<Component*> Scene::ParseComponents(Scene* scene, const tinyxml2::XMLElement * element)
-	{
-		using namespace tinyxml2;
-
-		std::vector<Component*> components;
-
-		const XMLElement* child = element->FirstChildElement();
-		while (child) {
-			std::string name(child->Name());
-			Component* component = nullptr;
-			if (name == "script")
-			{
-				//PARSE SCRIPT
-				component = ParseLuaScriptComponent(child);
-			}
-			else if (name == "camera")
-			{
-				//PARSE CAMERA
-				component = ParseCameraComponent(scene, child);
-			}
-			else if (name == "light")
-			{
-				//PARSE LIGHT
-				component = ParseLightComponent(child);
-			}
+        const XMLElement* child = element->FirstChildElement();
+        while (child)
+        {
+            std::string name(child->Name());
+            Component*  component = nullptr;
+            if (name == "script")
+            {
+                // PARSE SCRIPT
+                component = ParseLuaScriptComponent(child);
+            }
+            else if (name == "camera")
+            {
+                // PARSE CAMERA
+                component = ParseCameraComponent(scene, child);
+            }
+            else if (name == "light")
+            {
+                // PARSE LIGHT
+                component = ParseLightComponent(child);
+            }
             else if (name == "ui-text")
             {
-                //PARSE UI-TEXT
+                // PARSE UI-TEXT
                 component = ParseUITextComponent(child);
             }
-			else if (name == "model")
-			{
-				//PARSE MODEL COMPONENT
-				component = ParseModelComponent(child);
-			}
-			else if (name == "rigidbody")
-			{
-				//PARSE RIGIDBODY COMPONENT
-				component = ParseRigidBodyComponent(child);
-			}
+            else if (name == "model")
+            {
+                // PARSE MODEL COMPONENT
+                component = ParseModelComponent(child);
+            }
+            else if (name == "rigidbody")
+            {
+                // PARSE RIGIDBODY COMPONENT
+                component = ParseRigidBodyComponent(child);
+            }
 
-            if(component)
-			    components.push_back(component);
+            if (component)
+                components.push_back(component);
 
-			child = child->NextSiblingElement();
-		}
+            child = child->NextSiblingElement();
+        }
 
-		return components;
-	}
+        return components;
+    }
 
-	Component* Scene::ParseCameraComponent(Scene* scene, const tinyxml2::XMLElement * element)
-	{
-		using namespace tinyxml2;
-		
-		bool isMainCamera = element->BoolAttribute("mainCamera");
-		Camera3DComponent* _camera = new Camera3DComponent();
-		if (isMainCamera)
-			scene->m_mainCamera = _camera->GetCamera();
+    Component* Scene::ParseCameraComponent(Scene* scene, const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		const XMLElement* _viewportElement = element->FirstChildElement("viewport");
-		if (_viewportElement)
-		{
-			float x = _viewportElement->FloatAttribute("x");
-			float y = _viewportElement->FloatAttribute("y");
-			float w = _viewportElement->FloatAttribute("width");
-			float h = _viewportElement->FloatAttribute("height");
-			float minDepth = _viewportElement->FloatAttribute("min");
-			float maxDepth = _viewportElement->FloatAttribute("max");
+        bool               isMainCamera = element->BoolAttribute("mainCamera");
+        Camera3DComponent* _camera = new Camera3DComponent();
+        if (isMainCamera)
+            scene->m_mainCamera = _camera->GetCamera();
 
-			Viewport v;
+        const XMLElement* _viewportElement = element->FirstChildElement("viewport");
+        if (_viewportElement)
+        {
+            float x = _viewportElement->FloatAttribute("x");
+            float y = _viewportElement->FloatAttribute("y");
+            float w = _viewportElement->FloatAttribute("width");
+            float h = _viewportElement->FloatAttribute("height");
+            float minDepth = _viewportElement->FloatAttribute("min");
+            float maxDepth = _viewportElement->FloatAttribute("max");
+
+            Viewport v;
             v.xPercent = x;
             v.yPercent = y;
             v.wPercent = w;
             v.hPercent = h;
-			v.x = x * Window::Width();         //x as percentage of Screen Width
-			v.y = y * Window::Height();        //y as percentage of Screen Height
-			v.width = w * Window::Width();     //width as percentage of Screen Width
-			v.height = h * Window::Height();   //height as percentage of Screen Height
-			v.minDepth = minDepth;
-			v.maxDepth = maxDepth;
+            v.x = x * Window::Width();       // x as percentage of Screen Width
+            v.y = y * Window::Height();      // y as percentage of Screen Height
+            v.width = w * Window::Width();   // width as percentage of Screen Width
+            v.height = h * Window::Height(); // height as percentage of Screen Height
+            v.minDepth = minDepth;
+            v.maxDepth = maxDepth;
             v.sWidth = Window::Width();
             v.sHeight = Window::Height();
 
-			_camera->GetCamera()->VSetViewport(v);
-		}
+            _camera->GetCamera()->VSetViewport(v);
+        }
 
-		scene->AddCamera(_camera->GetCamera());
+        scene->AddCamera(_camera->GetCamera());
 
-		return _camera;
-	}
+        return _camera;
+    }
 
-    Component* Scene::ParseLightComponent(const tinyxml2::XMLElement * element)
-	{
-		using namespace tinyxml2;
+    Component* Scene::ParseLightComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		std::string type(element->Attribute("type"));
-		if (type == "point") {
+        std::string type(element->Attribute("type"));
+        if (type == "point")
+        {
 
             PointLightComponent* light = new PointLightComponent;
 
@@ -448,9 +441,9 @@ namespace Vixen {
                 float g = colorElement->FloatAttribute("g");
                 float b = colorElement->FloatAttribute("b");
                 float a = colorElement->FloatAttribute("a");
-                light->SetColor({ r, g, b, a });
+                light->SetColor({r, g, b, a});
             }
-			
+
             const XMLElement* attenElement = element->FirstChildElement("attenuation");
             if (attenElement)
             {
@@ -466,66 +459,68 @@ namespace Vixen {
             }
 
             return light;
-		}
-		else if (type == "spot") {
+        }
+        else if (type == "spot")
+        {
 
-			SpotLightComponent* light = new SpotLightComponent;
+            SpotLightComponent* light = new SpotLightComponent;
 
-			const XMLElement* colorElement = element->FirstChildElement("color");
-			if (colorElement)
-			{
-				float r = colorElement->FloatAttribute("r");
-				float g = colorElement->FloatAttribute("g");
-				float b = colorElement->FloatAttribute("b");
-				float a = colorElement->FloatAttribute("a");
-				light->SetColor({ r, g, b, a });
-			}
+            const XMLElement* colorElement = element->FirstChildElement("color");
+            if (colorElement)
+            {
+                float r = colorElement->FloatAttribute("r");
+                float g = colorElement->FloatAttribute("g");
+                float b = colorElement->FloatAttribute("b");
+                float a = colorElement->FloatAttribute("a");
+                light->SetColor({r, g, b, a});
+            }
 
-			const XMLElement* attenElement = element->FirstChildElement("attenuation");
-			if (attenElement)
-			{
-				float range = attenElement->FloatAttribute("range");
-				float angle = attenElement->FloatAttribute("angle");
-				float constant = attenElement->FloatAttribute("constant");
-				float linear = attenElement->FloatAttribute("linear");
-				float quadratic = attenElement->FloatAttribute("quadratic");
+            const XMLElement* attenElement = element->FirstChildElement("attenuation");
+            if (attenElement)
+            {
+                float range = attenElement->FloatAttribute("range");
+                float angle = attenElement->FloatAttribute("angle");
+                float constant = attenElement->FloatAttribute("constant");
+                float linear = attenElement->FloatAttribute("linear");
+                float quadratic = attenElement->FloatAttribute("quadratic");
 
-				light->SetRange(range);
-				light->SetConstant(constant);
-				light->SetLinear(linear);
-				light->SetQuadratic(quadratic);
-				light->SetAngle(angle);
+                light->SetRange(range);
+                light->SetConstant(constant);
+                light->SetLinear(linear);
+                light->SetQuadratic(quadratic);
+                light->SetAngle(angle);
+            }
 
-			}
+            return light;
+        }
+        else if (type == "directional")
+        {
+            /*float dirX = element->FloatAttribute("dirX");
+            float dirY = element->FloatAttribute("dirY");
+            float dirZ = element->FloatAttribute("dirZ");
+            light = new DirectionalLight;
+            light->m_ambientColor = Vector3(red, green, blue);
+            ((DirectionalLight*)light)->m_direction = Vector3(dirX, dirY, dirZ);*/
+        }
+        else
+        {
+            /*light = new ILight;
+            light->m_ambientColor = Vector3(red, green, blue);*/
+        }
 
-			return light;
-		}
-		else if (type == "directional") {
-			/*float dirX = element->FloatAttribute("dirX");
-			float dirY = element->FloatAttribute("dirY");
-			float dirZ = element->FloatAttribute("dirZ");
-			light = new DirectionalLight;
-			light->m_ambientColor = Vector3(red, green, blue);
-			((DirectionalLight*)light)->m_direction = Vector3(dirX, dirY, dirZ);*/
-		}
-		else {
-			/*light = new ILight;
-			light->m_ambientColor = Vector3(red, green, blue);*/
-		}
+        return nullptr;
+    }
 
-		return nullptr;
-	}
+    Component* Scene::ParseLuaScriptComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-    Component* Scene::ParseLuaScriptComponent(const tinyxml2::XMLElement * element)
-	{
-		using namespace tinyxml2;
+        const char* scriptFile = element->Attribute("file");
+        std::string scriptPath = scriptFile;
 
-		const char* scriptFile = element->Attribute("file");
-		UString scriptPath = UStringFromCharArray(scriptFile);
-
-		LuaScript* script = LuaScriptManager::LoadScript(scriptPath);
-		return script;
-	}
+        LuaScript* script = LuaScriptManager::LoadScript(scriptPath);
+        return script;
+    }
 
     Component* Scene::ParseUITextComponent(const tinyxml2::XMLElement* element)
     {
@@ -534,112 +529,112 @@ namespace Vixen {
         const char* text = element->Attribute("text");
         const char* font = element->Attribute("font");
 
+        Font* _font = ResourceManager::OpenFont(font);
+        _font->IncrementRefCount();
 
-        Font*  _font = ResourceManager::OpenFont(UStringFromCharArray(font));
-		_font->IncrementRefCount();
+        UIText* _text = new UIText(text, _font);
 
-        UIText* _text = new UIText(UStringFromCharArray(text), _font);
-		
         return _text;
     }
 
-	Component* Scene::ParseModelComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+    Component* Scene::ParseModelComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		const char* file = element->Attribute("file");
-		const char* materialFile = element->Attribute("material");
+        const char* file = element->Attribute("file");
+        const char* materialFile = element->Attribute("material");
 
-		Model* _model = ResourceManager::OpenModel(UStringFromCharArray(file));
-		if (!_model) {
-			DebugPrintF(VTEXT("Failed to open model.\n"));
-			return NULL;
-		}
-		_model->IncrementRefCount();
-			
-		Material* _material = ResourceManager::OpenMaterial(UStringFromCharArray(materialFile));
-		if (!_material) {
-			DebugPrintF(VTEXT("Failed to open material.\n"));
-			return NULL;
-		}
-		_material->IncrementRefCount();
+        Model* _model = ResourceManager::OpenModel(file);
+        if (!_model)
+        {
+            DebugPrintF("Failed to open model.\n");
+            return NULL;
+        }
+        _model->IncrementRefCount();
 
-		ModelComponent* _modelComponent = new ModelComponent;
-		_modelComponent->SetModel(_model);
-		_modelComponent->SetMaterial(_material);
-			
-		return _modelComponent;
-	}
+        Material* _material = ResourceManager::OpenMaterial(materialFile);
+        if (!_material)
+        {
+            DebugPrintF("Failed to open material.\n");
+            return NULL;
+        }
+        _material->IncrementRefCount();
 
-	Component* Scene::ParseRigidBodyComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+        ModelComponent* _modelComponent = new ModelComponent;
+        _modelComponent->SetModel(_model);
+        _modelComponent->SetMaterial(_material);
 
-		RigidBodyComponent* _component = new RigidBodyComponent;
+        return _modelComponent;
+    }
 
-		btScalar friction = element->FloatAttribute("friction");
-		btScalar mass = element->FloatAttribute("mass");
-		btScalar restitution = element->FloatAttribute("restitution");
+    Component* Scene::ParseRigidBodyComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
+        RigidBodyComponent* _component = new RigidBodyComponent;
 
-		const XMLElement* shape = element->FirstChildElement("shape");
-		if (shape)
-		{
-			std::string type = shape->Attribute("type");
-			if (type == "SPHERE")
-			{
-				//PARSE SPHERE COLLIDER
-				btScalar radius = shape->FloatAttribute("radius");
+        btScalar friction = element->FloatAttribute("friction");
+        btScalar mass = element->FloatAttribute("mass");
+        btScalar restitution = element->FloatAttribute("restitution");
 
-				BulletSphereCollider* _sphere = new BulletSphereCollider;
-				_sphere->SetRadius(radius);
+        const XMLElement* shape = element->FirstChildElement("shape");
+        if (shape)
+        {
+            std::string type = shape->Attribute("type");
+            if (type == "SPHERE")
+            {
+                // PARSE SPHERE COLLIDER
+                btScalar radius = shape->FloatAttribute("radius");
 
-				_component->SetColliderShape(_sphere);
-			}
-			else if (type == "PLANE")
-			{
-				//PARSE PLANE COLLIDER
+                BulletSphereCollider* _sphere = new BulletSphereCollider;
+                _sphere->SetRadius(radius);
 
-				btVector3 planeNormal;
+                _component->SetColliderShape(_sphere);
+            }
+            else if (type == "PLANE")
+            {
+                // PARSE PLANE COLLIDER
 
-				planeNormal.setX(shape->FloatAttribute("normalX"));
-				planeNormal.setY(shape->FloatAttribute("normalY"));
-				planeNormal.setZ(shape->FloatAttribute("normalZ"));
+                btVector3 planeNormal;
 
-				btScalar planeConstant = shape->FloatAttribute("constant");
+                planeNormal.setX(shape->FloatAttribute("normalX"));
+                planeNormal.setY(shape->FloatAttribute("normalY"));
+                planeNormal.setZ(shape->FloatAttribute("normalZ"));
 
-				BulletPlaneCollider* _plane = new BulletPlaneCollider;
-				_plane->SetPlaneNormal(planeNormal);
-				_plane->SetPlaneContant(planeConstant);
-				
-				_component->SetColliderShape(_plane);
-			}
-			else if (type == "BOX")
-			{
-				//PARSE BOX COLLIDER
+                btScalar planeConstant = shape->FloatAttribute("constant");
 
-				btVector3 extents;
+                BulletPlaneCollider* _plane = new BulletPlaneCollider;
+                _plane->SetPlaneNormal(planeNormal);
+                _plane->SetPlaneContant(planeConstant);
 
-				extents.setX(shape->FloatAttribute("extentX"));
-				extents.setY(shape->FloatAttribute("extentY"));
-				extents.setZ(shape->FloatAttribute("extentZ"));
+                _component->SetColliderShape(_plane);
+            }
+            else if (type == "BOX")
+            {
+                // PARSE BOX COLLIDER
 
-				BulletBoxCollider* _box = new BulletBoxCollider;
-				_box->SetExtents(extents);
+                btVector3 extents;
 
-				_component->SetColliderShape(_box);
-			}
-			else
-			{
-				DebugPrintF(VTEXT("Rigidbody is missing collider shape. ERROR\n"));
-				return NULL;
-			}
-		}
+                extents.setX(shape->FloatAttribute("extentX"));
+                extents.setY(shape->FloatAttribute("extentY"));
+                extents.setZ(shape->FloatAttribute("extentZ"));
 
-		_component->SetFriction(friction);
-		_component->SetMass(mass);
-		_component->SetRestitution(restitution);
+                BulletBoxCollider* _box = new BulletBoxCollider;
+                _box->SetExtents(extents);
 
-		return _component;
-	}
-}
+                _component->SetColliderShape(_box);
+            }
+            else
+            {
+                DebugPrintF("Rigidbody is missing collider shape. ERROR\n");
+                return NULL;
+            }
+        }
+
+        _component->SetFriction(friction);
+        _component->SetMass(mass);
+        _component->SetRestitution(restitution);
+
+        return _component;
+    }
+} // namespace Vixen

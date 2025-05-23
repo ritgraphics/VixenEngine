@@ -41,7 +41,7 @@ namespace Vixen {
 		virtual void    Toggle(void) = 0;
 		virtual void    Show(void) = 0;
 		virtual void    Hide(void) = 0;
-		virtual UString Buffer(void) = 0;
+		virtual std::string Buffer(void) = 0;
 		virtual void	Write(const char* text, size_t len) = 0;
 		virtual void	Erase(size_t len) = 0;
 		virtual void    Render(IRenderer* renderer, int x, int y) = 0;
@@ -49,7 +49,7 @@ namespace Vixen {
 		virtual void    SetTexture(Texture* tex) = 0;
 
 	protected:
-		USStream  m_buffer;
+		std::stringstream  m_buffer;
 		int       m_offset;
 		bool      m_visible;
 		BMFont*   m_font;

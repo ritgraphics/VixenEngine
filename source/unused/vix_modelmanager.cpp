@@ -44,7 +44,7 @@ namespace Vixen {
     //        //we should now open for reading
     //        XMLDOC document;
     //        XMLError err = document.LoadFile(file->Handle());
-    //        UString errString;
+    //        std::string errString;
     //        if (XMLErrCheck(err, errString))
     //        {
     //            DebugPrintF(VTEXT("Models Config File failed to load\n"));
@@ -57,7 +57,7 @@ namespace Vixen {
     //        while (modelElement != NULL)
     //        {
     //            const char* fileID = modelElement->Attribute("file");
-    //            UString id = UStringFromCharArray(fileID);
+    //            std::string id = UStringFromCharArray(fileID);
     //            IModel* model = ResourceManager::OpenModel(id);
     //            if (model)
     //                _manager.m_models[id] = model;
@@ -79,7 +79,7 @@ namespace Vixen {
         //STLMAP_DELETE(ModelManager::instance().m_models);
     }
 
-    IModel* ModelManager::AccessModel(UString id)
+    IModel* ModelManager::AccessModel(std::string id)
     {
         ModelManager& _manager = ModelManager::instance();
 
@@ -90,7 +90,7 @@ namespace Vixen {
             return NULL;
     }
 
-	void ModelManager::RegisterModel(UString id, IModel* model)
+	void ModelManager::RegisterModel(std::string id, IModel* model)
 	{
 		ModelManager& _manager = ModelManager::instance();
 

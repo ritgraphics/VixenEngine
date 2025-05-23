@@ -55,7 +55,7 @@ namespace Vixen {
 
 	struct VIX_API SDL_GW_Params
 	{
-		UString title;
+		std::string title;
 		int x;
 		int y;
 		int width;
@@ -75,7 +75,7 @@ namespace Vixen {
 		void                VSetVisible(bool flag)                 override;
 		void                VSetFullscreen(bool flag)              override;
 		void                VSwapBuffers()                         override;
-		const UString&      VGetTitle()                            override;
+		const std::string&      VGetTitle()                            override;
 		const Rect          VGetClientBounds()                     override;
 		bool                VIsRunning()                           override;
 		bool                VIsHidden()                            override;

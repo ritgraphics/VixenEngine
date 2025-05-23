@@ -28,17 +28,17 @@
 
 namespace Vixen {
 
-    const UString LuaScript::OBJECT_TABLE = VTEXT("_GO");
-    const UString LuaScript::AWAKE_FUNC = VTEXT("OnAwake");
-    const UString LuaScript::UPDATE_FUNC = VTEXT("OnUpdate");
-    const UString LuaScript::LATEUPDATE_FUNC = VTEXT("OnLateUpdate");
-    const UString LuaScript::AWAKE_FULL_SIGN = LuaScript::OBJECT_TABLE +
+    const std::string LuaScript::OBJECT_TABLE = VTEXT("_GO");
+    const std::string LuaScript::AWAKE_FUNC = VTEXT("OnAwake");
+    const std::string LuaScript::UPDATE_FUNC = VTEXT("OnUpdate");
+    const std::string LuaScript::LATEUPDATE_FUNC = VTEXT("OnLateUpdate");
+    const std::string LuaScript::AWAKE_FULL_SIGN = LuaScript::OBJECT_TABLE +
         VTEXT(".") +
         LuaScript::AWAKE_FUNC;
-    const UString LuaScript::UPDATE_FULL_SIGN = LuaScript::OBJECT_TABLE +
+    const std::string LuaScript::UPDATE_FULL_SIGN = LuaScript::OBJECT_TABLE +
         VTEXT(".") +
         LuaScript::UPDATE_FUNC;
-    const UString LuaScript::LATEUPDATE_FULL_SIGN = LuaScript::OBJECT_TABLE +
+    const std::string LuaScript::LATEUPDATE_FULL_SIGN = LuaScript::OBJECT_TABLE +
         VTEXT(".") +
         LuaScript::LATEUPDATE_FUNC;
 

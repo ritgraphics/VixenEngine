@@ -41,9 +41,9 @@ enum class ErrCode
 	ERR_GLEW_INIT_FAIL,
 };
 
-inline UString ErrCodeString(ErrCode error)
+inline std::string ErrCodeString(ErrCode error)
 {
-	UString errorMsg;
+	std::string errorMsg;
 
 	switch (error)
 	{

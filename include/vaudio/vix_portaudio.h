@@ -91,7 +91,7 @@ VIX_API
 void PAUDIO_QueryDevices();
 
 VIX_API
-void PAUDIO_QueryDevices(USStream& stream);
+void PAUDIO_QueryDevices(std::stringstream& stream);
 
 /*
 *   PAUDIO_Sleep
@@ -111,7 +111,7 @@ VIX_API
 void PAUDIO_PrintDevice(const PaDeviceInfo* dInfo, size_t i);
 
 VIX_API
-void PAUDIO_PrintDevice(USStream& stream, const PaDeviceInfo* dInof, size_t i);
+void PAUDIO_PrintDevice(std::stringstream& stream, const PaDeviceInfo* dInof, size_t i);
 
 
 VIX_API

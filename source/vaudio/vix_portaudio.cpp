@@ -59,7 +59,7 @@ PAUDIO_Error(PaError err)
 		const char* errText = Pa_GetErrorText(err);
 #ifdef UNICODE
 		UConverter cv;
-		UString text = cv.from_bytes(errText);
+		std::string text = cv.from_bytes(errText);
 		DebugPrintF(VTEXT("PortAudio Error: %s\n"), text.c_str());
 #else
 		DebugPrintF(VTEXT("PortAudio Error: %s\n"), errText);
@@ -106,7 +106,7 @@ void PAUDIO_QueryDevices()
 	}
 }
 
-void PAUDIO_QueryDevices(USStream& stream)
+void PAUDIO_QueryDevices(std::stringstream& stream)
 {
 	using namespace Vixen;
 
@@ -175,9 +175,9 @@ PAUDIO_PrintDevice(const PaDeviceInfo* dInfo, size_t i)
 
 #ifdef UNICODE
 	UConverter cv;
-	UString name = cv.from_bytes(dInfo->name);
+	std::string name = cv.from_bytes(dInfo->name);
 #else
-	UString name(dInfo->name);
+	std::string name(dInfo->name);
 #endif
 
 
@@ -188,7 +188,7 @@ PAUDIO_PrintDevice(const PaDeviceInfo* dInfo, size_t i)
 }
 
 void
-PAUDIO_PrintDevice(USStream& stream, const PaDeviceInfo* dInfo, size_t i)
+PAUDIO_PrintDevice(std::stringstream& stream, const PaDeviceInfo* dInfo, size_t i)
 {
 	using namespace Vixen;
 
@@ -198,9 +198,9 @@ PAUDIO_PrintDevice(USStream& stream, const PaDeviceInfo* dInfo, size_t i)
 
 #ifdef UNICODE
 	UConverter cv;
-	UString name = cv.from_bytes(dInfo->name);
+	std::string name = cv.from_bytes(dInfo->name);
 #else
-	UString name(dInfo->name);
+	std::string name(dInfo->name);
 #endif
 
 

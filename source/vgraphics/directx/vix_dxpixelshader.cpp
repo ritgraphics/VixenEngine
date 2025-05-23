@@ -40,11 +40,7 @@ namespace Vixen
     {
         HRESULT hr = S_OK;
 
-        BYTE* data = new BYTE[VIX_LARGE_BUFSIZE];
-        file->Seek(0, FileSeek::End);
-        size_t _size = file->Tell();
-        file->Seek(0, FileSeek::Set);
-        file->Read(data, _size); // read all of the file into memory
+        const auto bytes = file->ReadAllBytes();
 
         DWORD dwShaderFlags = D3DCOMPILE_ENABLE_STRICTNESS;
 #ifdef _DEBUG
@@ -59,7 +55,7 @@ namespace Vixen
 #endif
 
         winrt::com_ptr<ID3DBlob> errorBlob = nullptr;
-        hr = D3DCompile2(data, _size, nullptr, nullptr, nullptr, "main", "ps_5_0", NULL, NULL, NULL, NULL, NULL,
+        hr = D3DCompile2(bytes.data(), bytes.size(), nullptr, nullptr, nullptr, "main", "ps_5_0", NULL, NULL, NULL, NULL, NULL,
                          &m_shaderBlob, errorBlob.put());
         // hr = D3DReadFileToBlob(file->FilePath().c_str(), &m_shaderBlob);
         if (FAILED(hr))

@@ -13,7 +13,7 @@ namespace Vixen {
 
 		static const int     WIDTH;
 		static const int     HEIGHT;
-		static const UString TITLE;
+		static const std::string TITLE;
 
 	public:
 		ConfigApp();

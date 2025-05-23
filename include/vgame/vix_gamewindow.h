@@ -49,7 +49,7 @@ namespace Vixen {
 		virtual void               VSetVisible(bool flag) = 0;
 		virtual void               VTogglePaused() = 0;
 		virtual void               VSwapBuffers() = 0;
-		virtual const UString&     VGetTitle() = 0;
+		virtual const std::string&     VGetTitle() = 0;
 		virtual const Rect         VGetClientBounds() = 0;
 		virtual bool               VIsRunning() = 0;
 		virtual bool               VIsPaused() = 0;
@@ -75,7 +75,7 @@ namespace Vixen {
 		static const size_t DEF_WINDOW_HEIGHT = 600;
 
 	protected:
-		UString				m_title;
+		std::string				m_title;
 		Rect                m_clientRect;
         IKeyboardState*     m_keyboardState;
         IMouseState*        m_mouseState;

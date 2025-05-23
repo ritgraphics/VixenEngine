@@ -60,12 +60,12 @@ namespace Vixen{
 		if (!renderer || !m_texture || !m_font)
 			return;
 
-		USStream ss;
+		std::stringstream ss;
 		ss << "<>: " << m_buffer.str();
 
 		((GLRenderer*)renderer)->Render2DTexture((GLTexture*)m_texture,
 			Vector2(x, y), Rect(0, 0, 0, 0), Vector2(0, 0), Vector2(1, 1), 0.0f, 1.0f, Colors::White, 0.0f);
-		((GLRenderer*)renderer)->Render2DText(m_font, UString(ss.str().c_str()),
+		((GLRenderer*)renderer)->Render2DText(m_font, std::string(ss.str().c_str()),
 			Vector2(x+15, y+20), 1.0f, Colors::Snow);
 	}
 
@@ -84,7 +84,7 @@ namespace Vixen{
 		m_visible = !m_visible;
 	}
 
-	UString SDLConsole::Buffer()
+	std::string SDLConsole::Buffer()
 	{
 		return m_buffer.str();
 	}
@@ -110,7 +110,7 @@ namespace Vixen{
 		}
 
 		/*kinda gross, a lot of copying but o well....*/
-		UString temp = m_buffer.str();
+		std::string temp = m_buffer.str();
 		size_t end = temp.length();
 		if (end != 0)
 			temp = temp.erase(end - len);

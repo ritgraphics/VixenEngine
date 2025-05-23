@@ -34,7 +34,7 @@ namespace Vixen {
 
 	class VIX_API PrefabManager : public Singleton<PrefabManager>
 	{
-		typedef std::map<UString, Prefab*> PrefabMap;
+		typedef std::map<std::string, Prefab*> PrefabMap;
 	public:
 
 		static bool		Initialize();
@@ -43,12 +43,12 @@ namespace Vixen {
 
 		static Prefab*	Load(std::string file);
 
-		static Prefab*	GetPrefab(UString file);
+		static Prefab*	GetPrefab(std::string file);
 
 		static void     Cleanup();
 
 	private:
-		static Prefab*					LoadFile(UString file);
+		static Prefab*					LoadFile(std::string file);
 		static Prefab*					ParsePrefab(const tinyxml2::XMLElement* element);
 		static void						ParseTransform(Prefab* prefab, const tinyxml2::XMLElement* element);
 		static void                     ParseComponents(Prefab* prefab, const tinyxml2::XMLElement* element);

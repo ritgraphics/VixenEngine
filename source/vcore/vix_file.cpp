@@ -22,246 +22,68 @@
 */
 
 #include <vix_file.h>
-#include <vix_fileutil.h>
-#include <cstring>
-#include <cerrno>
 
-#ifdef VIX_SYS_LINUX
-	#include <sys/stat.h>
-#endif
+#include <filesystem>
 
+#include <fmt/format.h>
 
 namespace Vixen {
 
-	File::File()
-		: IFile()
+	File::File(const char* path)
 	{
-		m_position = 0;
-		m_size = 0;
-	}
+        //const std::filesystem::path basepath = SDL_GetBasePath();
+		//m_filePath = basepath / path;
 
-	File::~File()
-	{
-		Close();
-	}
+		m_filePath = std::filesystem::path(path);
 
-
-	bool File::Open(UString path, FileMode mode)
-	{
-		m_filePath = os_path(path);
-		m_fileName = getFileName(m_filePath);
-		m_baseName = getFileName(m_filePath, false);
-
-        switch (mode)
-        {
-            case FileMode::ReadBinary:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("rb"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "rb");
-#endif
-            } break;
-
-            case FileMode::ReadText:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("r"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "r");
-#endif
-            } break;
-
-            case FileMode::WriteBinary:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("wb"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "wb");
-#endif
-            } break;
-
-            case FileMode::WriteText:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("w"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "w");
-#endif
-            } break;
-
-            case FileMode::AppendBinary:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("ab"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "ab");
-#endif
-            } break;
-
-            case FileMode::AppendText:
-            {
-#ifdef VIX_SYS_WINDOWS
-                _wfopen_s(&m_handle, m_filePath.c_str(), VTEXT("a"));
-#else
-                m_handle = fopen(m_filePath.c_str(), "a");
-#endif
-            } break;
-
-            default:
-                break;
-        }
-
-		if(!m_handle) {
-			m_error = FileError::Open;
-			PError();
-			return false;
-		}
-
-		return true;
-	}
-
-	bool File::Close()
-	{
-		int ret = 0;
-		//Close file if handle still active
-		if(m_handle)
+		SDL_IOStream* stream = SDL_IOFromFile(m_filePath.string().c_str(), "rb");
+		if (!stream)
 		{
-			ret = fclose(m_handle);
-			m_handle = NULL;
+			throw std::runtime_error(fmt::format("Failed to open file: {}", FileName()));
 		}
 
-		return (ret < 0) ? false : true;
+		m_stream.reset(stream);
 	}
 
-	bool File::Flush()
+	std::vector<uint8_t> File::ReadAllBytes()
 	{
-		return false;
-	}
+		SDL_SeekIO(m_stream.get(), 0, SDL_IO_SEEK_END);
+		const auto numBytes = SDL_TellIO(m_stream.get());
+		SDL_SeekIO(m_stream.get(), 0, SDL_IO_SEEK_SET);
 
-	size_t File::Read(BYTE* out, size_t len)
-	{
-		size_t _len = 0;
+		std::vector<uint8_t> bytes(numBytes);
 
-		_len = fread(out, sizeof(BYTE), len, m_handle);
-
-		return _len;
-	}
-
-    size_t File::Write(BYTE* in, size_t len)
-    {
-        size_t _len = 0;
-
-        _len = fwrite(in, sizeof(BYTE), len, m_handle);
-
-        return _len;
-    }
-
-	bool File::Seek(size_t pos, FileSeek mode)
-	{
-		if(!m_handle)
-			return false;
-
-		int ret = 0;
-		switch(mode)
+		size_t numBytesRead;
+		void*  data = SDL_LoadFile_IO(m_stream.get(), &numBytesRead, false);
+		if (data == nullptr)
 		{
-			case FileSeek::Set:
-			{
-				ret = fseek(m_handle, pos, SEEK_SET);
-			} break;
-
-			case FileSeek::Current:
-			{
-				ret = fseek(m_handle, pos, SEEK_CUR);
-			} break;
-
-			case FileSeek::End:
-			{
-				ret = fseek(m_handle, pos, SEEK_END);
-			} break;
+			throw std::runtime_error(fmt::format("Failed to read file: {}", FileName()));
 		}
 
-		m_position = Tell();
+		memcpy(bytes.data(), data, numBytesRead);
+		SDL_free(data);
 
-		return (ret != 0) ? false : true;
+		return bytes;
 	}
 
-	bool File::PError(int err /* = 0 */)
+	
+	std::string File::BaseName()
 	{
-#ifdef VIX_SYS_WINDOWS
-		UChar s_buffer[VIX_BUFSIZE];
-		_wcserror_s(s_buffer, VIX_BUFSIZE, errno);
-		_wcserror_s(s_buffer, errno);
-		DebugPrintF(VTEXT("FileError: %s"), s_buffer);
-#else
-		DebugPrintF(VTEXT("FileError: %s"), strerror(errno));
-#endif
-		return (err < 0) ? true : false;
+		return m_filePath.stem().string();
 	}
 
-	size_t File::Tell()
+	std::string File::FileName()
 	{
-		return ftell(m_handle);
+		return m_filePath.filename().string();
 	}
 
-	size_t File::Position()
+	std::string File::FilePath()
 	{
-		return m_position;
+		return m_filePath.string();
 	}
-
-	size_t File::SizeBytes()
+	
+	std::string File::Extension()
 	{
-
-#ifdef VIX_SYS_LINUX
-		//Need to grab size from stat struct in order to allow for
-		//files > 2GB in size
-		struct stat st;
-		stat(m_filePath.c_str(), &st);
-		m_size = st.st_size;
-#else
-		WIN32_FILE_ATTRIBUTE_DATA fad;
-		if (!GetFileAttributesEx(m_filePath.c_str(), GetFileExInfoStandard, &fad))
-			return -1;
-
-		LARGE_INTEGER size;
-		size.HighPart = fad.nFileSizeHigh;
-		size.LowPart = fad.nFileSizeLow;
-
-		m_size = static_cast<size_t>(size.QuadPart);
-#endif
-
-		return m_size;
+		return m_filePath.extension().string();
 	}
-
-	size_t File::SizeKBytes()
-	{
-		return SizeBytes() / 1024;
-	}
-
-	FileError File::Error()
-	{
-		return m_error;
-	}
-
-	UString File::BaseName()
-	{
-		return m_baseName;
-	}
-
-	UString File::FileName()
-	{
-		return m_fileName;
-	}
-
-	UString File::FilePath()
-	{
-		return m_filePath;
-	}
-
-	FILE* File::Handle()
-	{
-		return m_handle;
-	}
-
-
 }

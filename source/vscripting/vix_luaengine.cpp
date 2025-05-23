@@ -70,7 +70,7 @@ namespace Vixen {
 		return ErrCode::ERR_SUCCESS;
 	}
 
-	ErrCode LuaEngine::VExecuteFile(const UString& path)
+	ErrCode LuaEngine::VExecuteFile(const std::string& path)
 	{
 		ErrCode error = ErrCode::ERR_SUCCESS;
 
@@ -89,7 +89,7 @@ namespace Vixen {
 		return error;
 	}
 
-	ErrCode LuaEngine::VExecuteExpression(const UString& expression)
+	ErrCode LuaEngine::VExecuteExpression(const std::string& expression)
 	{
 		ErrCode error = ErrCode::ERR_SUCCESS;
 

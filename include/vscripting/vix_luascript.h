@@ -33,8 +33,8 @@ namespace Vixen {
 
 	struct LuaScriptInfo
 	{
-		UString file;
-		UString raw;
+		std::string file;
+		std::string raw;
 	};
 
 	class LuaEngine;
@@ -59,13 +59,13 @@ namespace Vixen {
 		typedef luabridge::LuaRef LuaRef;
 		/*CONTANTS*/
 	public:
-		static const UString OBJECT_TABLE;
-		static const UString AWAKE_FUNC;
-		static const UString UPDATE_FUNC;
-		static const UString LATEUPDATE_FUNC;
-		static const UString AWAKE_FULL_SIGN;
-		static const UString UPDATE_FULL_SIGN;
-		static const UString LATEUPDATE_FULL_SIGN;
+		static const std::string OBJECT_TABLE;
+		static const std::string AWAKE_FUNC;
+		static const std::string UPDATE_FUNC;
+		static const std::string LATEUPDATE_FUNC;
+		static const std::string AWAKE_FULL_SIGN;
+		static const std::string UPDATE_FULL_SIGN;
+		static const std::string LATEUPDATE_FULL_SIGN;
 
 	public:
 		LuaScript(LuaScriptInfo info);

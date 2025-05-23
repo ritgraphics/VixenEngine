@@ -37,7 +37,7 @@ namespace Vixen {
 	{
 		//friend class Singleton <AudioManager>;
 
-		typedef std::map<UString, SoundClip*> SoundMap;
+		typedef std::map<std::string, SoundClip*> SoundMap;
 
 		const int MAX_CHANNELS = 100;
 
@@ -58,7 +58,7 @@ namespace Vixen {
 		ErrCode VShutDown() override;
 
 		/*create sound*/
-		void CreateSound(const UString& path);
+		void CreateSound(const std::string& path);
 
 	private:
 		FMOD::System* m_system;

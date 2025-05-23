@@ -41,11 +41,12 @@ namespace Vixen {
 		for (auto& shader : m_shaders)
 			ResourceManager::DecrementAssetRef(shader.second);
 
-		STLMAP_DELETE(m_vsVariables);
-		STLMAP_DELETE(m_psVariables);
+		// TODO: delete shader variables
+		//STLMAP_DELETE(m_vsVariables);
+		//STLMAP_DELETE(m_psVariables);
     }
 
-	UString DXMaterial::VFilePath()
+	std::string DXMaterial::VFilePath()
 	{
 		return m_path;
 	}
@@ -95,13 +96,14 @@ namespace Vixen {
 
 		m_path = file->FileName();
 
+		const auto bytes = file->ReadAllBytes();
 
 		XMLDOC document;
-		XMLError err = document.LoadFile(file->Handle());
-		UString errString;
+		XMLError err = document.Parse((const char*)bytes.data(), bytes.size());
+		std::string errString;
 		if (XMLErrCheck(err, errString))
 		{
-			DebugPrintF(VTEXT("Vixen Material File: %s failed to load\n"), file->BaseName().c_str());
+			DebugPrintF("Vixen Material File: %s failed to load\n", file->BaseName().c_str());
 			return false;
 		}
 
@@ -110,11 +112,11 @@ namespace Vixen {
 		//PARSE VERTEX SHADER
 		XMLElement* vsElement = matElement->FirstChildElement("vertex-shader");
 		if (!vsElement) {
-			DebugPrintF(VTEXT("Vixen Material File: %s, missing vertex-shader"), file->BaseName().c_str());
+			DebugPrintF("Vixen Material File: %s, missing vertex-shader", file->BaseName().c_str());
 			return false;
 		}
 
-		UString shaderPath = UStringFromCharArray(vsElement->Attribute("file"));
+		std::string shaderPath = vsElement->Attribute("file");
 		Shader* vsShader = ResourceManager::OpenShader(shaderPath, ShaderType::VERTEX_SHADER);
 		vsShader->IncrementRefCount();
 		if (!vsShader)
@@ -127,11 +129,11 @@ namespace Vixen {
 		//PARSE PIXEL SHADER
 		XMLElement* psElement = matElement->FirstChildElement("pixel-shader");
 		if (!psElement) {
-			DebugPrintF(VTEXT("Vixen Material File: %s, missing pixel-shader"), file->BaseName().c_str());
+			DebugPrintF("Vixen Material File: %s, missing pixel-shader", file->BaseName().c_str());
 			return false;
 		}
 
-		shaderPath = UStringFromCharArray(psElement->Attribute("file"));
+		shaderPath = psElement->Attribute("file");
 		Shader* psShader = ResourceManager::OpenShader(shaderPath, ShaderType::PIXEL_SHADER);
 		psShader->IncrementRefCount();
 		if (!psShader)

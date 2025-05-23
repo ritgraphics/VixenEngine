@@ -28,59 +28,19 @@
 #include <string>
 #include <sstream>
 #include <vector>
-#ifndef VIX_SYS_LINUX
-#include <codecvt>
-#endif
 #include <iostream>
-
-
-
-/*Unicode system type defines*/
-#if defined(VIX_SYS_WINDOWS) && defined(UNICODE)
-typedef std::wstring          UString;
-typedef wchar_t               UChar;
-typedef std::wstringstream    USStream;
-typedef std::wostream         UOStream;
-typedef std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> UConverter;  //not implemented in libstd++ yet...
-#else /*UNIX or not Unicode defined*/
-typedef std::string           UString;
-typedef char                  UChar;
-typedef std::stringstream     USStream;
-typedef std::ostream          UOStream;
-#endif
-
-/*Unicode MACRO definitions*/
-#ifdef UNICODE
-#define _VTEXT(x) L##x
-#define VTEXT(x) _VTEXT(x)
-#else
-#define VTEXT(x) x
-#endif
-
 
 namespace Vixen {
 
-
-		VIX_API
-		void str_replaceAll(UString& input,
-			                const UString& from,
-			                const UString& to);
-
-        VIX_API
-        std::string UStringToStd(const UString& str);
-
-        VIX_API
-        UString UStringFromCharArray(const char* str);
-
 		template<typename T>
-		inline VIX_API std::vector<T> parse(const UString s, const UChar delim)
+		inline VIX_API std::vector<T> parse(const std::string s, const char delim)
 		{
-			USStream ss(s);
-			UString item;
+			std::stringstream ss(s);
+			std::string item;
 			std::vector<T> elems;
 			while (std::getline(ss, item, delim)) {
 				if (!item.empty()) {
-					USStream es(item);
+					std::stringstream es(item);
 					T t;
 					es >> t;
 					elems.push_back(t);

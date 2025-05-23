@@ -128,7 +128,7 @@ inline void DXCheckError(HRESULT hr)
         (LPTSTR)&err, 0, NULL);
     if (err != NULL)
     {
-        Vixen::DebugPrintF(VTEXT("%s"), err);
+        Vixen::DebugPrintF("%s", err);
 
         LocalFree(err);
         err = NULL;

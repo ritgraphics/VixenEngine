@@ -25,10 +25,10 @@
 
 namespace Vixen {
 
-	UString DebugTimeStamp()
+	std::string DebugTimeStamp()
 	{
 		using namespace std::chrono;
-		USStream ss;
+		std::stringstream ss;
 
 		system_clock::time_point now_point = system_clock::now();
 		std::time_t now_time = system_clock::to_time_t(now_point);

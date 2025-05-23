@@ -42,17 +42,17 @@ namespace Vixen {
 
 	class VIX_API ContentManager : public IManager, INonCopy
 	{
-	  typedef std::map<UString, IContent*> ContentMap;
+	  typedef std::map<std::string, IContent*> ContentMap;
 	public:
 		ContentManager();
 
 		~ContentManager();
 
 		template <typename T>
-		T* Load(const UString& path);
+		T* Load(const std::string& path);
 
-		BMFont*  LoadFont(const UString& path);
-		Texture* LoadTexture(const UString& path);
+		BMFont*  LoadFont(const std::string& path);
+		Texture* LoadTexture(const std::string& path);
 
 		void DumpTextures();
 
@@ -67,7 +67,7 @@ namespace Vixen {
 	};
 
 	template <typename T>
-	  T* ContentManager::Load(const UString& path)
+	  T* ContentManager::Load(const std::string& path)
 	  {
 	    return NULL;
 	  }

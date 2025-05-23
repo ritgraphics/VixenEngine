@@ -9,7 +9,7 @@
 
 
 VIX_API
-void OGGVORBIS_OpenFile(const UString path);
+void OGGVORBIS_OpenFile(const std::string path);
 
 
 #endif

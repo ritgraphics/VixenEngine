@@ -36,7 +36,7 @@
 
 namespace Vixen {
 
-	VIX_API UOStream& operator << (UOStream& o, const BMFontInfo& i)
+	VIX_API std::ostream& operator << (std::ostream& o, const BMFontInfo& i)
 	{
 		o << "[BMFontInfo]\n"
 			<< "\tFace=" << i.face << "\n"
@@ -60,7 +60,7 @@ namespace Vixen {
 		return o;
 	}
 
-	VIX_API UOStream& operator << (UOStream& o, const BMFontCommon& c)
+	VIX_API std::ostream& operator << (std::ostream& o, const BMFontCommon& c)
 	{
 		o << "[BMFontCommon]\n"
 		<< "\tLineHeight=" << c.lineHeight << "\n"
@@ -78,7 +78,7 @@ namespace Vixen {
 	}
 
 
-	VIX_API UOStream& operator << (UOStream& o, const BMFontPage& p)
+	VIX_API std::ostream& operator << (std::ostream& o, const BMFontPage& p)
 	{
 		o << "[BMFontPage]\n"
 		<< "\tID=" << p.id << "\n"
@@ -87,7 +87,7 @@ namespace Vixen {
 		return o;
 	}
 
-	VIX_API UOStream& operator << (UOStream& o, const BMFontKerning& k)
+	VIX_API std::ostream& operator << (std::ostream& o, const BMFontKerning& k)
 	{
 		o << "[BMFontKerning]\n"
 			<< "\tFirst=" << k.first << "\n"
@@ -97,9 +97,9 @@ namespace Vixen {
 		return o;
 	}
 
-	UString BMFontFile::ToString() const
+	std::string BMFontFile::ToString() const
 	{
-		USStream ss;
+		std::stringstream ss;
 		ss << "---BMFontFile---" << "\n" << "\n"
 			<< "File: " << file << "\n"
 			<< info << "\n" << common;
@@ -120,7 +120,7 @@ namespace Vixen {
 		/*Create character map*/
 		for (BMFontChar& fontChar : m_fontFile.chars)
 		{
-			UChar c = (UChar)fontChar.id;
+			char c = (char)fontChar.id;
 			m_charMap[c] = fontChar;
 		}
 	}
@@ -138,10 +138,10 @@ namespace Vixen {
 		std::thread t([&](BMFont* font, std::atomic<bool>* finished) {
 
 			/*Need to load all page bitmaps*/
-			UString assetPath = PathManager::instance().AssetPath();
+			std::string assetPath = PathManager::instance().AssetPath();
 
 			for (auto& page : font->m_fontFile.pages) {
-				UString texPath = assetPath + VTEXT("Fonts/Textures/") + page.file;
+				std::string texPath = assetPath + VTEXT("Fonts/Textures/") + page.file;
 				FileManager::instance().OpenFile(texPath);
 				File* bitmapFile = FileManager::instance().AccessFile(texPath);
 				if(bitmapFile) {
@@ -177,7 +177,7 @@ namespace Vixen {
 		}
 	}
 
-	void BMFont::LoadPageBitmap(const UString filePath)
+	void BMFont::LoadPageBitmap(const std::string filePath)
 	{
 		/*if (!bitmap) {
 			DebugPrintF(VTEXT("Cannot add NULL bitmap"));
@@ -224,14 +224,14 @@ namespace Vixen {
 	}
 
 	/*Returns the pixel unit bounds of a string of text*/
-	Rectangle BMFont::Bounds(const UString& text)
+	Rectangle BMFont::Bounds(const std::string& text)
 	{
 		Rectangle bounds;
 		int dx = 0;
 		int lineH = m_fontFile.common.lineHeight;
 		int dy = lineH;
 		/*Iterate over characters in text*/
-		for (const UChar& c : text)
+		for (const char& c : text)
 		{
 			if (c == '\n') {
 				dx = 0;
@@ -254,7 +254,7 @@ namespace Vixen {
 		return bounds;
 	}
 
-	bool BMFont::FindChar(UChar c, BMFontChar& fc)
+	bool BMFont::FindChar(char c, BMFontChar& fc)
 	{
 		BMCharMap::iterator it = m_charMap.find(c);
 		if (it != m_charMap.end())
@@ -280,7 +280,7 @@ namespace Vixen {
 		/*TinyXML now supports paths containing UTF-8 encoded characters due to
 		  change I've made in the source. */
 		XMLError err = document.LoadFile(file->Handle());
-		UString errorString;
+		std::string errorString;
 		if (XMLErrCheck(err, errorString)) {
 			DebugPrintF(VTEXT("XMLDocument [%s] Load Failed\n"),
 				        file->FilePath().c_str());
@@ -309,7 +309,7 @@ namespace Vixen {
 		const char* _charset = infoElement->Attribute("charset");
 		const char* _padding = infoElement->Attribute("padding");
 		const char* _spacing = infoElement->Attribute("spacing");
-		UString spacing;
+		std::string spacing;
 #ifdef UNICODE
 		UConverter cv;
 		info.face = cv.from_bytes(_face);

@@ -40,8 +40,8 @@ namespace Vixen {
 
 	struct FREEIMAGE_BMP
 	{
-		UString           name;
-		UString           path;
+		std::string           name;
+		std::string           path;
 		FIBITMAP*         bitmap;           
 		FREE_IMAGE_FORMAT format;
 		BYTE*			  data;
@@ -55,9 +55,9 @@ namespace Vixen {
 		}
 	};
 
-	VIX_API FREE_IMAGE_FORMAT	FREEIMAGE_FormatFromExtension(const UString& ext);
-	VIX_API FREEIMAGE_BMP*		FREEIMAGE_LoadImage(const UString& filePath);
-	VIX_API FREEIMAGE_BMP*		FREEIMAGE_LoadImage(const UString& filePath, BYTE* raw_data, int len);
+	VIX_API FREE_IMAGE_FORMAT	FREEIMAGE_FormatFromExtension(const std::string& ext);
+	VIX_API FREEIMAGE_BMP*		FREEIMAGE_LoadImage(const std::string& filePath);
+	VIX_API FREEIMAGE_BMP*		FREEIMAGE_LoadImage(const std::string& filePath, BYTE* raw_data, int len);
 	VIX_API FREEIMAGE_BMP*		FREEIMAGE_LoadImage(File* file);
 	VIX_API void                FREEIMAGE_LoadPNGHeader(FREEIMAGE_HEADER* header, BYTE* raw_data);
 	VIX_API void                FREEIMAGE_LoadJPGHeader(FREEIMAGE_HEADER* header, BYTE* raw_data);

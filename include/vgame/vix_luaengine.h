@@ -47,10 +47,10 @@ namespace Vixen {
         static bool DeInitialize();
 
         /*Execute Lua script file*/
-        static bool ExecuteFile(UString filePath);
+        static bool ExecuteFile(std::string filePath);
 
         /*Execute Lua expression*/
-        static bool ExecuteExpression(UString expression);
+        static bool ExecuteExpression(std::string expression);
 
     private:
         /*report errors in evaluated lua scripts*/

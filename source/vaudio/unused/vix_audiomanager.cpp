@@ -74,7 +74,7 @@ namespace Vixen {
 		return error;
 	}
 
-	void AudioManager::CreateSound(const UString& path)
+	void AudioManager::CreateSound(const std::string& path)
 	{
 		m_sounds[path] = new SoundClip(m_system, path);
 	}

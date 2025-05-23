@@ -96,7 +96,7 @@ namespace Vixen {
 
 	}
 	
-	void    VRenderText2D(IFont* font, UString text, const Vector2& pos)
+	void    VRenderText2D(IFont* font, std::string text, const Vector2& pos)
 	{
 
 	}

@@ -27,15 +27,15 @@
 namespace Vixen {
 
 	FREE_IMAGE_FORMAT
-	FREEIMAGE_FormatFromExtension(const UString& ext)
+	FREEIMAGE_FormatFromExtension(const std::string& ext)
 	{
-		if (ext == VTEXT("png"))
+		if (ext == ".png")
 			return FIF_PNG;
-		if (ext == VTEXT("jpg"))
+		if (ext == ".jpg")
 			return FIF_JPEG;
-		if (ext == VTEXT("bmp"))
+		if (ext == ".bmp")
 			return FIF_BMP;
-		if (ext == VTEXT("tga"))
+		if (ext == ".tga")
 			return FIF_TARGA;
 
 		return FIF_UNKNOWN;
@@ -70,7 +70,7 @@ namespace Vixen {
 	}
 
 	FREEIMAGE_BMP*
-	FREEIMAGE_LoadImage(const UString& filePath)
+	FREEIMAGE_LoadImage(const std::string& filePath)
 	{
 		FREEIMAGE_BMP* vix_bmp = new FREEIMAGE_BMP;
 		vix_bmp->path = filePath;
@@ -82,17 +82,9 @@ namespace Vixen {
 		/*Here we must */
 
 		//Check file signature and deduce format
-#ifdef UNICODE
-		vix_bmp->format = FreeImage_GetFileTypeU(filePath.c_str());
-#else
 		vix_bmp->format = FreeImage_GetFileType(filePath.c_str());
-#endif
 		if (vix_bmp->format == FIF_UNKNOWN) {
-#ifdef UNICODE
-			vix_bmp->format = FreeImage_GetFIFFromFilenameU(filePath.c_str());
-#else
 			vix_bmp->format = FreeImage_GetFIFFromFilename(filePath.c_str());
-#endif
 		}
 
 		//if still unknown, return NULL;
@@ -101,13 +93,7 @@ namespace Vixen {
 
 		//Check if FreeImage has reading capabilities
 		if (FreeImage_FIFSupportsReading(vix_bmp->format)) {
-#ifdef UNICODE
-			//read image into struct pointer
-			vix_bmp->bitmap = FreeImage_LoadU(vix_bmp->format, filePath.c_str());
-#else
 			vix_bmp->bitmap = FreeImage_Load(vix_bmp->format, filePath.c_str());
-#endif
-
 		}
 
 		//If image failed to load, return NULL
@@ -131,7 +117,7 @@ namespace Vixen {
 
 
 	FREEIMAGE_BMP*
-	FREEIMAGE_LoadImage(const UString& filePath, BYTE* raw_data, int len)
+	FREEIMAGE_LoadImage(const std::string& filePath, BYTE* raw_data, int len)
 	{
 		if (!raw_data)
 			return NULL;
@@ -200,7 +186,7 @@ namespace Vixen {
 		FREEIMAGE_BMP* vix_bmp = new FREEIMAGE_BMP;
 		vix_bmp->path = file->FilePath();
 		vix_bmp->name = file->FileName();
-		vix_bmp->format = FREEIMAGE_FormatFromExtension(getFileExtension(file->FilePath(), false));
+		vix_bmp->format = FREEIMAGE_FormatFromExtension(file->Extension());
 		vix_bmp->data = NULL;
 		vix_bmp->bitmap = NULL;
 
@@ -210,9 +196,13 @@ namespace Vixen {
 		io.seek_proc = reinterpret_cast<FI_SeekProc>(&SeekFile);
 		io.tell_proc = reinterpret_cast<FI_TellProc>(&TellFile);
 
-		vix_bmp->bitmap = FreeImage_LoadFromHandle(vix_bmp->format, &io, (fi_handle)file->Handle(), NULL);
+		const auto bytes = file->ReadAllBytes();
+		
+		FIMEMORY* memory = FreeImage_OpenMemory((BYTE*)bytes.data(), bytes.size());
+		vix_bmp->bitmap = FreeImage_LoadFromMemory(vix_bmp->format, memory);
+        FreeImage_CloseMemory(memory);
 		if(!vix_bmp->bitmap)
-			DebugPrintF(VTEXT("Load bitmap failed\n"));
+			DebugPrintF("Load bitmap failed\n");
 
 		//If image failed to load, return NULL
 		if (!vix_bmp->bitmap)

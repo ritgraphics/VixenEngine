@@ -32,16 +32,16 @@ namespace Vixen {
 
     struct VIX_API BMFontInfo
     {
-        UString    face;
+        std::string    face;
         int            size;
         int            bold;
         int            italic;
-        UString    charset;
+        std::string    charset;
         int            unicode;
         int            stretchH;
         int            smooth;
         int            antiAliasing;
-        UString    padding;
+        std::string    padding;
         int            padX;
         int            padY;
         int            padW;
@@ -71,7 +71,7 @@ namespace Vixen {
     struct VIX_API BMFontPage
     {
         int         id;
-        UString     file;
+        std::string     file;
     };
 
 
@@ -84,7 +84,7 @@ namespace Vixen {
 
     struct VIX_API BMFontFile
     {
-        UString                     file;
+        std::string                     file;
         BMFontInfo                  info;
         BMFontCommon                common;
         std::vector<BMFontPage>     pages;
@@ -101,11 +101,11 @@ namespace Vixen {
 
         bool        VInitFromFile(File* file);
         Texture*    VPageTexture(size_t index);
-        bool        VFindChar(UChar c, FontChar& fontChar);
+        bool        VFindChar(char c, FontChar& fontChar);
 
         float       VLineHeight();
 
-		Rect		VBounds(UString text);
+		Rect		VBounds(std::string text);
       
 
     private:

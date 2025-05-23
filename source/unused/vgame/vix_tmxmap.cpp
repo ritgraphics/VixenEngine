@@ -29,7 +29,7 @@ namespace Vixen {
 
 	/***********************TMXLAYER*********************/
 
-	TMXLayer::TMXLayer(const UString& name,
+	TMXLayer::TMXLayer(const std::string& name,
 							size_t	  width,
 							size_t	  height,
 							float	  opacity,
@@ -75,7 +75,7 @@ namespace Vixen {
 
 	}
 
-	void TMXMap::FromFile(const UString& file, TMXMap& map)
+	void TMXMap::FromFile(const std::string& file, TMXMap& map)
 	{
 		using namespace tinyxml2;
 
@@ -85,7 +85,7 @@ namespace Vixen {
 		/*TinyXML now supports paths containing UTF-8 encoded characters due to
 		  change I've made in the source. */
 		XMLError err = document.LoadFile(file.c_str());
-		UString errorString;
+		std::string errorString;
 		if (XMLErrCheck(err, errorString)) {
 			DebugPrintF(VTEXT("XMLDocument Load Failed: %s\n"),
 				        errorString.c_str());

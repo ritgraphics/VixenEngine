@@ -303,7 +303,7 @@ namespace Vixen {
 		return m_children[index];
 	}
 
-	void GameObject::SetName(UString name)
+	void GameObject::SetName(std::string name)
 	{
 		m_name = name;
 	}
@@ -320,7 +320,7 @@ namespace Vixen {
 
 	std::string GameObject::GetName()
 	{
-		return UStringToStd(m_name);
+		return m_name;
 	}
 
 }

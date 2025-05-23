@@ -71,7 +71,7 @@ namespace Vixen {
 		void        SetID(uint32_t id);
 
 		std::string GetName();
-		void        SetName(UString id);
+		void        SetName(std::string id);
 
 		GameObject* GetParent();
 
@@ -85,7 +85,7 @@ namespace Vixen {
 		bool						m_markedForDestroy;
         bool                        m_markedForLateRender;
 		uint32_t                    m_id;
-		UString                     m_name;
+		std::string                     m_name;
 		Transform*					m_transform;
 
 		std::vector<Component*>		m_components;

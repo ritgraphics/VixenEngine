@@ -26,7 +26,7 @@
 namespace Vixen {
 
 	SoundClip::SoundClip(FMOD::System* system,
-		                 const UString& path)
+		                 const std::string& path)
 	{
 #if defined UNICODE && defined VIX_SYS_WINDOWS
 		UConverter cv;

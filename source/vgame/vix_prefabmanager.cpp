@@ -1,367 +1,374 @@
 /*
-	The MIT License(MIT)
+    The MIT License(MIT)
 
-	Copyright(c) 2015 Vixen Team, Matt Guerrette
+    Copyright(c) 2015 Vixen Team, Matt Guerrette
 
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files(the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions :
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files(the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and / or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions :
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
 
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 */
 
 #include <vix_prefabmanager.h>
 #include <vix_tinyxml.h>
-#include <vix_filemanager.h>
 #include <vix_pathmanager.h>
 #include <vix_scenemanager.h>
 #include <vix_luascriptmanager.h>
 #include <vix_components.h>
 #include <vix_resourcemanager.h>
 
-namespace Vixen {
+namespace Vixen
+{
 
-	bool PrefabManager::Initialize()
-	{
-		return true;
+    bool PrefabManager::Initialize()
+    {
+        return true;
+    }
 
-	}
+    void PrefabManager::DeInitialize()
+    {
+    }
 
-	void PrefabManager::DeInitialize()
-	{
+    Prefab* PrefabManager::GetPrefab(std::string file)
+    {
+        PrefabManager& _manager = PrefabManager::instance();
 
-	}
+        PrefabMap::iterator it = _manager.m_prefabs.find(file);
+        if (it != _manager.m_prefabs.end())
+            return it->second;
+        else
+            return NULL;
+    }
 
-	Prefab* PrefabManager::GetPrefab(UString file)
-	{
-		PrefabManager& _manager = PrefabManager::instance();
+    Prefab* PrefabManager::Load(std::string file)
+    {
+        std::string _filePath = file.c_str();
+        Prefab*     _prefab = PrefabManager::GetPrefab(_filePath);
 
-		PrefabMap::iterator it = _manager.m_prefabs.find(file);
-		if (it != _manager.m_prefabs.end())
-			return it->second;
-		else
-			return NULL;
-	}
+        if (!_prefab)
+            _prefab = PrefabManager::LoadFile(_filePath);
 
-	Prefab* PrefabManager::Load(std::string file)
-	{
-		UString _filePath = UStringFromCharArray(file.c_str());
-		Prefab* _prefab = PrefabManager::GetPrefab(_filePath);
+        return _prefab;
+    }
 
-		if (!_prefab)
-			_prefab = PrefabManager::LoadFile(_filePath);
+    void PrefabManager::Cleanup()
+    {
+        PrefabManager& _manager = PrefabManager::instance();
 
-		return _prefab;
-	}
+        PrefabMap::iterator it = _manager.m_prefabs.begin();
+        for (it; it != _manager.m_prefabs.end();)
+        {
+            Prefab* _p = it->second;
+            if (_p && _p->RefCount() == 0)
+            {
+                _manager.m_prefabs.erase(it++);
+                delete _p;
+            }
+            else
+                ++it;
+        }
+    }
 
-	void PrefabManager::Cleanup()
-	{
-		PrefabManager& _manager = PrefabManager::instance();
+    Prefab* PrefabManager::LoadFile(std::string file)
+    {
+        PrefabManager& _manager = PrefabManager::instance();
 
-		PrefabMap::iterator it = _manager.m_prefabs.begin();
-		for (it; it != _manager.m_prefabs.end();)
-		{
-			Prefab* _p = it->second;
-			if (_p && _p->RefCount() == 0)
-			{
-				_manager.m_prefabs.erase(it++);
-				delete _p;
-			}
-			else
-				++it;
-		}
-	}
+        using namespace tinyxml2;
 
-	Prefab* PrefabManager::LoadFile(UString file)
-	{
-		PrefabManager& _manager = PrefabManager::instance();
+        try
+        {
 
+            File _prefabFile(PathManager::PrefabPath().append(file).string().c_str());
 
-		using namespace tinyxml2;
+            const auto bytes = _prefabFile.ReadAllBytes();
 
-		File* _prefabFile = FileManager::OpenFile(PathManager::PrefabPath() + file, FileMode::ReadBinary);
-		if (_prefabFile)
-		{
-			//File is actually an XML file
-			//we should now open for reading
-			XMLDOC document;
-			XMLError err = document.LoadFile(_prefabFile->Handle());
-			UString errString;
-			if (XMLErrCheck(err, errString))
-			{
-				DebugPrintF(VTEXT("Prefab File failed to load\n"));
-                FileManager::CloseFile(_prefabFile);
-				return NULL;
-			}
+            // File is actually an XML file
+            // we should now open for reading
+            XMLDOC      document;
+            XMLError    err = document.Parse((const char*)bytes.data(), bytes.size());
+            std::string errString;
+            if (XMLErrCheck(err, errString))
+            {
+                DebugPrintF("Prefab File failed to load\n");
+                return NULL;
+            }
 
-			const XMLElement* prefab = document.FirstChildElement("prefab");
-			const XMLElement* object = prefab->FirstChildElement("gameobject");
-			if (prefab)
-			{
-				if (object)
-				{
-					Prefab* _prefab = ParsePrefab(object);
+            const XMLElement* prefab = document.FirstChildElement("prefab");
+            const XMLElement* object = prefab->FirstChildElement("gameobject");
+            if (prefab)
+            {
+                if (object)
+                {
+                    Prefab* _prefab = ParsePrefab(object);
 
-					_manager.m_prefabs[file] = _prefab;
-                    FileManager::CloseFile(_prefabFile);
-					return _prefab;
-				}
-			}
-		}
-		FileManager::CloseFile(_prefabFile);
-		return NULL;
-	}
+                    _manager.m_prefabs[file] = _prefab;
+                    return _prefab;
+                }
+            }
+        }
+        catch (const std::exception& e)
+        {
+            SDL_Log("PrefabManager::LoadFile Exception: %s", e.what());
+        }
+        return NULL;
+    }
 
-	void PrefabManager::ParseTransform(Prefab* prefab, const tinyxml2::XMLElement* element)
-	{
-		if (!element || !prefab)
-			return;
+    void PrefabManager::ParseTransform(Prefab* prefab, const tinyxml2::XMLElement* element)
+    {
+        if (!element || !prefab)
+            return;
 
-		float posX = element->FloatAttribute("x");
-		float posY = element->FloatAttribute("y");
-		float posZ = element->FloatAttribute("z");
-		float rotX = element->FloatAttribute("rotX");
-		float rotY = element->FloatAttribute("rotY");
-		float rotZ = element->FloatAttribute("rotZ");
-		float scaleX = element->FloatAttribute("scaleX");
-		float scaleY = element->FloatAttribute("scaleY");
-		float scaleZ = element->FloatAttribute("scaleZ");
-		
-		prefab->SetTransform(Transform(posX, posY, posZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ));
-	}
+        float posX = element->FloatAttribute("x");
+        float posY = element->FloatAttribute("y");
+        float posZ = element->FloatAttribute("z");
+        float rotX = element->FloatAttribute("rotX");
+        float rotY = element->FloatAttribute("rotY");
+        float rotZ = element->FloatAttribute("rotZ");
+        float scaleX = element->FloatAttribute("scaleX");
+        float scaleY = element->FloatAttribute("scaleY");
+        float scaleZ = element->FloatAttribute("scaleZ");
 
-	void PrefabManager::ParseComponents(Prefab* prefab, const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+        prefab->SetTransform(Transform(posX, posY, posZ, rotX, rotY, rotZ, scaleX, scaleY, scaleZ));
+    }
 
-		const XMLElement* child = element->FirstChildElement();
-		while (child) {
+    void PrefabManager::ParseComponents(Prefab* prefab, const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-			std::string name(child->Name());
-			Component* _component = NULL;
-			if (name == "script")
-			{
-				//PARSE SCRIPT
-				_component = ParseLuaScriptComponent(child);
-			}
-			else if (name == "camera")
-			{
-				//PARSE CAMERA
-				_component = ParseCameraComponent(child);
-			}
-			else if (name == "light")
-			{
-				//PARSE LIGHT
-				_component = ParseLightComponent(child);
-			}
-			else if (name == "ui-text")
-			{
-				//PARSE UI TEXT
-				_component = ParseUITextComponent(child);
-			}
-			else if (name == "model")
-			{
-				_component = ParseModelComponent(child);
-			}
+        const XMLElement* child = element->FirstChildElement();
+        while (child)
+        {
 
-			if (_component != NULL)
-				prefab->AddComponent(_component);
+            std::string name(child->Name());
+            Component*  _component = NULL;
+            if (name == "script")
+            {
+                // PARSE SCRIPT
+                _component = ParseLuaScriptComponent(child);
+            }
+            else if (name == "camera")
+            {
+                // PARSE CAMERA
+                _component = ParseCameraComponent(child);
+            }
+            else if (name == "light")
+            {
+                // PARSE LIGHT
+                _component = ParseLightComponent(child);
+            }
+            else if (name == "ui-text")
+            {
+                // PARSE UI TEXT
+                _component = ParseUITextComponent(child);
+            }
+            else if (name == "model")
+            {
+                _component = ParseModelComponent(child);
+            }
 
-			child = child->NextSiblingElement();
-		}
-	}
+            if (_component != NULL)
+                prefab->AddComponent(_component);
 
-	Component* PrefabManager::ParseUITextComponent(const tinyxml2::XMLElement* element)
-	{
+            child = child->NextSiblingElement();
+        }
+    }
+
+    Component* PrefabManager::ParseUITextComponent(const tinyxml2::XMLElement* element)
+    {
         using namespace tinyxml2;
 
         const char* text = element->Attribute("text");
         const char* font = element->Attribute("font");
 
-
-        Font*  _font = ResourceManager::OpenFont(UStringFromCharArray(font));
+        Font* _font = ResourceManager::OpenFont(font);
         _font->IncrementRefCount();
-
-        UIText* _text = new UIText(UStringFromCharArray(text), _font);
+        
+        UIText* _text = new UIText(text, _font);
 
         return _text;
-	}
+    }
 
-	Component* PrefabManager::ParseCameraComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+    Component* PrefabManager::ParseCameraComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		Camera3DComponent* _camera = new Camera3DComponent();
-		const XMLElement* _viewportElement = element->FirstChildElement("viewport");
-		if (_viewportElement)
-		{
-			float x = _viewportElement->FloatAttribute("x");
-			float y = _viewportElement->FloatAttribute("y");
-			float width = _viewportElement->FloatAttribute("width");
-			float height = _viewportElement->FloatAttribute("height");
-			float minDepth = _viewportElement->FloatAttribute("min");
-			float maxDepth = _viewportElement->FloatAttribute("max");
+        Camera3DComponent* _camera = new Camera3DComponent();
+        const XMLElement*  _viewportElement = element->FirstChildElement("viewport");
+        if (_viewportElement)
+        {
+            float x = _viewportElement->FloatAttribute("x");
+            float y = _viewportElement->FloatAttribute("y");
+            float width = _viewportElement->FloatAttribute("width");
+            float height = _viewportElement->FloatAttribute("height");
+            float minDepth = _viewportElement->FloatAttribute("min");
+            float maxDepth = _viewportElement->FloatAttribute("max");
 
-			Viewport v;
-			v.x = x;
-			v.y = y;
-			v.width = width;
-			v.height = height;
-			v.minDepth = minDepth;
-			v.maxDepth = maxDepth;
+            Viewport v;
+            v.x = x;
+            v.y = y;
+            v.width = width;
+            v.height = height;
+            v.minDepth = minDepth;
+            v.maxDepth = maxDepth;
 
-			_camera->GetCamera()->VSetViewport(v);
-		}
+            _camera->GetCamera()->VSetViewport(v);
+        }
 
-		return _camera;
-	}
+        return _camera;
+    }
 
-	Component* PrefabManager::ParseLightComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+    Component* PrefabManager::ParseLightComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		std::string type(element->Attribute("type"));
-		if (type == "point") {
+        std::string type(element->Attribute("type"));
+        if (type == "point")
+        {
 
-			PointLightComponent* light = new PointLightComponent;
+            PointLightComponent* light = new PointLightComponent;
 
-			const XMLElement* colorElement = element->FirstChildElement("color");
-			if (colorElement)
-			{
-				float r = colorElement->FloatAttribute("r");
-				float g = colorElement->FloatAttribute("g");
-				float b = colorElement->FloatAttribute("b");
-				float a = colorElement->FloatAttribute("a");
-				light->SetColor({ r, g, b, a });
-			}
+            const XMLElement* colorElement = element->FirstChildElement("color");
+            if (colorElement)
+            {
+                float r = colorElement->FloatAttribute("r");
+                float g = colorElement->FloatAttribute("g");
+                float b = colorElement->FloatAttribute("b");
+                float a = colorElement->FloatAttribute("a");
+                light->SetColor({r, g, b, a});
+            }
 
-			const XMLElement* attenElement = element->FirstChildElement("attenuation");
-			if (attenElement)
-			{
-				float range = attenElement->FloatAttribute("range");
-				float constant = attenElement->FloatAttribute("constant");
-				float linear = attenElement->FloatAttribute("linear");
-				float quadratic = attenElement->FloatAttribute("quadratic");
+            const XMLElement* attenElement = element->FirstChildElement("attenuation");
+            if (attenElement)
+            {
+                float range = attenElement->FloatAttribute("range");
+                float constant = attenElement->FloatAttribute("constant");
+                float linear = attenElement->FloatAttribute("linear");
+                float quadratic = attenElement->FloatAttribute("quadratic");
 
-				light->SetRange(range);
-				light->SetConstant(constant);
-				light->SetLinear(linear);
-				light->SetQuadratic(quadratic);
-			}
+                light->SetRange(range);
+                light->SetConstant(constant);
+                light->SetLinear(linear);
+                light->SetQuadratic(quadratic);
+            }
 
-			return light;
-		}
-		else if (type == "directional") {
-			/*float dirX = element->FloatAttribute("dirX");
-			float dirY = element->FloatAttribute("dirY");
-			float dirZ = element->FloatAttribute("dirZ");
-			light = new DirectionalLight;
-			light->m_ambientColor = Vector3(red, green, blue);
-			((DirectionalLight*)light)->m_direction = Vector3(dirX, dirY, dirZ);*/
-		}
-		else {
-			/*light = new ILight;
-			light->m_ambientColor = Vector3(red, green, blue);*/
-		}
+            return light;
+        }
+        else if (type == "directional")
+        {
+            /*float dirX = element->FloatAttribute("dirX");
+            float dirY = element->FloatAttribute("dirY");
+            float dirZ = element->FloatAttribute("dirZ");
+            light = new DirectionalLight;
+            light->m_ambientColor = Vector3(red, green, blue);
+            ((DirectionalLight*)light)->m_direction = Vector3(dirX, dirY, dirZ);*/
+        }
+        else
+        {
+            /*light = new ILight;
+            light->m_ambientColor = Vector3(red, green, blue);*/
+        }
 
-		return nullptr;
-	}
+        return nullptr;
+    }
 
-	Component* PrefabManager::ParseLuaScriptComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+    Component* PrefabManager::ParseLuaScriptComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		const char* scriptFile = element->Attribute("file");
-		UString scriptPath = UStringFromCharArray(scriptFile);
+        const char* scriptFile = element->Attribute("file");
+        std::string scriptPath = scriptFile;
 
-		LuaScript* script = LuaScriptManager::LoadScript(scriptPath);
-		script->SetPath(scriptPath);
+        LuaScript* script = LuaScriptManager::LoadScript(scriptPath);
+        script->SetPath(scriptPath);
 
-		return script;
-	}
+        return script;
+    }
 
-	Component* PrefabManager::ParseModelComponent(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+    Component* PrefabManager::ParseModelComponent(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		const char* file = element->Attribute("file");
-		const char* materialFile = element->Attribute("material");
+        const char* file = element->Attribute("file");
+        const char* materialFile = element->Attribute("material");
 
-		Model* _model = (Model*)ResourceManager::AccessAsset(UStringFromCharArray(file));
-		if (!_model) {
-			_model = ResourceManager::OpenModel(UStringFromCharArray(file));
-			if (!_model) {
-				DebugPrintF(VTEXT("Failed to open model.\n"));
-				return NULL;
-			}
-		}
-		_model->IncrementRefCount();
-		
-		Material* _material = ResourceManager::OpenMaterial(UStringFromCharArray(materialFile));
-		if (!_material) {
-			DebugPrintF(VTEXT("Failed to open material.\n"));
-			return NULL;
-		}
-		_material->IncrementRefCount();
+        Model* _model = (Model*)ResourceManager::AccessAsset(file);
+        if (!_model)
+        {
+            _model = ResourceManager::OpenModel(file);
+            if (!_model)
+            {
+                DebugPrintF("Failed to open model.\n");
+                return NULL;
+            }
+        }
+        _model->IncrementRefCount();
 
-		ModelComponent* _modelComponent = new ModelComponent;
-		_modelComponent->SetModel(_model);
-		_modelComponent->SetMaterial(_material);
+        Material* _material = ResourceManager::OpenMaterial(materialFile);
+        if (!_material)
+        {
+            DebugPrintF("Failed to open material.\n");
+            return NULL;
+        }
+        _material->IncrementRefCount();
 
-		return _modelComponent;
-	}
+        ModelComponent* _modelComponent = new ModelComponent;
+        _modelComponent->SetModel(_model);
+        _modelComponent->SetMaterial(_material);
 
-	Prefab* PrefabManager::ParsePrefab(const tinyxml2::XMLElement* element)
-	{
-		using namespace tinyxml2;
+        return _modelComponent;
+    }
 
-		Prefab* _newPrefab = new Prefab;
+    Prefab* PrefabManager::ParsePrefab(const tinyxml2::XMLElement* element)
+    {
+        using namespace tinyxml2;
 
-		std::string name = element->Attribute("name");
-		_newPrefab->SetName(name);
-		_newPrefab->SetEnabled(element->BoolAttribute("enabled"));
+        Prefab* _newPrefab = new Prefab;
 
-		//PARSE PREFAB TRANSFORM
-		const XMLElement* transform = element->FirstChildElement("transform");
-		ParseTransform(_newPrefab, transform);
-		
+        std::string name = element->Attribute("name");
+        _newPrefab->SetName(name);
+        _newPrefab->SetEnabled(element->BoolAttribute("enabled"));
 
-		//PARSE PREFAB MODEL
-		const XMLElement* model = element->FirstChildElement("model");
-		if(model)
-			_newPrefab->SetModelFile(model->Attribute("file"));
+        // PARSE PREFAB TRANSFORM
+        const XMLElement* transform = element->FirstChildElement("transform");
+        ParseTransform(_newPrefab, transform);
 
-		//PARSE PREFAB COMPONENTS
-		const XMLElement* components = element->FirstChildElement("components");
-		if (components)
-			ParseComponents(_newPrefab, components);
+        // PARSE PREFAB MODEL
+        const XMLElement* model = element->FirstChildElement("model");
+        if (model)
+            _newPrefab->SetModelFile(model->Attribute("file"));
 
-		//PARSE PREFAB CHILDREN
-		const XMLElement* children = element->FirstChildElement("children");
-		if (children)
-		{
-			const XMLElement* childElement = children->FirstChildElement("gameobject");
-			while (childElement != NULL)
-			{
-				Prefab* _child = ParsePrefab(childElement);
+        // PARSE PREFAB COMPONENTS
+        const XMLElement* components = element->FirstChildElement("components");
+        if (components)
+            ParseComponents(_newPrefab, components);
 
-				_newPrefab->AddChild(_child);
-			    
-				childElement = childElement->NextSiblingElement("gameobject");
-			}
-		}
-		
-		return _newPrefab;
-	}
-}
+        // PARSE PREFAB CHILDREN
+        const XMLElement* children = element->FirstChildElement("children");
+        if (children)
+        {
+            const XMLElement* childElement = children->FirstChildElement("gameobject");
+            while (childElement != NULL)
+            {
+                Prefab* _child = ParsePrefab(childElement);
+
+                _newPrefab->AddChild(_child);
+
+                childElement = childElement->NextSiblingElement("gameobject");
+            }
+        }
+
+        return _newPrefab;
+    }
+} // namespace Vixen

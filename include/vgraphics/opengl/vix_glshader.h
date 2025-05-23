@@ -49,7 +49,7 @@ namespace Vixen {
 	private:
 
 		bool  					LoadShader(const GLchar* source);
-		static const GLchar* 	ReadShader(const UString& path);
+		static const GLchar* 	ReadShader(const std::string& path);
 		static GLenum        	GLShaderType(ShaderType type);
 		static bool       		ValidateCompile(GLuint shader);
 

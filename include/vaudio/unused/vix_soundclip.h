@@ -32,7 +32,7 @@ namespace Vixen {
 	class VIX_API SoundClip
 	{
 	public:
-		SoundClip(FMOD::System* system, const UString& path);
+		SoundClip(FMOD::System* system, const std::string& path);
 
 		~SoundClip();
 

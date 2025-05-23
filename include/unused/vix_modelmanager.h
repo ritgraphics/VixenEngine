@@ -33,14 +33,14 @@ namespace Vixen {
 
     class VIX_API ModelManager : public Singleton<ModelManager>
     {
-        typedef std::map<UString, IModel*> ModelMap;
+        typedef std::map<std::string, IModel*> ModelMap;
     public:
        
         
         //static bool    Initialize();
         static void    DeInitialize();
-		static void	   RegisterModel(UString id, IModel* model);
-        static IModel* AccessModel(UString id);
+		static void	   RegisterModel(std::string id, IModel* model);
+        static IModel* AccessModel(std::string id);
         static std::vector<IModel*> ActiveModels();
 
     private:

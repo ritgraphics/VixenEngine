@@ -25,7 +25,7 @@
 #define VIX_RESOURCEMANAGER_H
 
 #include <vix_platform.h>
-#include <vix_filemanager.h>
+#include <vix_singleton.h>
 #include <vix_resourceloader.h>
 #include <vix_texture.h>
 #include <vix_shader.h>
@@ -68,17 +68,17 @@ namespace Vixen {
         static void DeInitialize();
 
         static void         AttachResourceLoader(IResourceLoader* loader);
-        static Texture*    OpenTexture(UString filePath);
-        static Shader*     OpenShader(UString filePath, ShaderType type);
-        static Model*      OpenModel(UString filePath);
-        static Font*       OpenFont(UString filePath);
-        static Material*   OpenMaterial(UString filePath);
+        static Texture*    OpenTexture(std::string filePath);
+        static Shader*     OpenShader(std::string filePath, ShaderType type);
+        static Model*      OpenModel(std::string filePath);
+        static Font*       OpenFont(std::string filePath);
+        static Material*   OpenMaterial(std::string filePath);
 
-		static Asset*		AccessAsset(UString assetName);
-		static void			MapAsset(UString assetName, Asset* asset);
+		static Asset*		AccessAsset(std::string assetName);
+		static void			MapAsset(std::string assetName, Asset* asset);
 		static void			ReleaseAsset(Asset* asset);
 
-		static std::map<UString, Model*>& LoadedModels();
+		static std::map<std::string, Model*>& LoadedModels();
 
         static void         IncrementAssetRef(Asset* asset);
         static void         DecrementAssetRef(Asset* asset);
@@ -88,8 +88,8 @@ namespace Vixen {
     private:
         IResourceLoader* m_resourceLoader;
 
-		std::map<UString, Asset*> m_assetMap;
-		std::map<UString, Model*> m_models;
+		std::map<std::string, Asset*> m_assetMap;
+		std::map<std::string, Model*> m_models;
     };
 
 

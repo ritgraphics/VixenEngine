@@ -46,8 +46,8 @@ namespace Vixen {
 	struct ShaderInfo
 	{
 		ShaderType type;       /*type of shader*/
-		UString    filePath;   /*path to shader*/
-		UString    raw;        /*raw contents of shader*/
+		std::string    filePath;   /*path to shader*/
+		std::string    raw;        /*raw contents of shader*/
 	};
 
 	class VIX_API Shader : public Asset

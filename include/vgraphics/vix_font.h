@@ -50,16 +50,16 @@ namespace Vixen {
     class VIX_API Font : public Asset
     {
     public:
-        typedef std::map<UChar, FontChar> CharMap;
+        typedef std::map<char, FontChar> CharMap;
 
 		Font();
 
         virtual ~Font() { };
 
         virtual Texture* VPageTexture(size_t index) = 0;
-        virtual bool      VFindChar(UChar c, FontChar& fontChar) = 0;
+        virtual bool      VFindChar(char c, FontChar& fontChar) = 0;
         virtual float     VLineHeight() = 0;
-		virtual Rect       VBounds(UString text) = 0;
+		virtual Rect       VBounds(std::string text) = 0;
       
     };
 

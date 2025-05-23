@@ -62,7 +62,7 @@ namespace Vixen {
         using namespace tinyxml2;
        
         Assimp::Importer _importer;
-		std::string _path = UStringToStd(file->FilePath());
+		std::string _path = file->FilePath();
         const aiScene* scene = _importer.ReadFile(_path.c_str(), aiProcess_CalcTangentSpace |
             aiProcess_Triangulate |
             aiProcess_GenNormals |
@@ -73,8 +73,8 @@ namespace Vixen {
             aiProcess_FlipUVs);
         if (!scene)
         {
-            const UChar* message = UStringFromCharArray(_importer.GetErrorString()).c_str();
-            DebugPrintF(VTEXT("ASSIMP READ ERROR: %s\n"), message);
+            const char* message = _importer.GetErrorString();
+            DebugPrintF("ASSIMP READ ERROR: %s\n", message);
             return false;
         }
 

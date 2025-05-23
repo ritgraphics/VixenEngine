@@ -104,7 +104,7 @@ ARCHIVE_Write(const char* outname, const char** paths)
 	Vixen::File* file = NULL;
 	while(*paths)
 	{
-		UString _path = Vixen::UStringFromCharArray(*paths);
+		std::string _path = Vixen::UStringFromCharArray(*paths);
 		Vixen::FileManager::OpenFile(_path);
 		file = Vixen::FileManager::AccessFile(_path);
 		entry = archive_entry_new();

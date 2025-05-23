@@ -40,11 +40,11 @@ namespace Vixen {
 	// DEFAULT VERTEX / FRAGMENT SHADERS
 	//////////////////////////////////////////////////////////////////////////
 
-	static const UString UNIFORM_PROJECTION = UString(VTEXT("gProjection"));
-	static const UString UNIFORM_SAMPLER = UString(VTEXT("gSampler"));
-	static const UString OUT_TEXCOORD = UString(VTEXT("TexCoord0"));
-	static const UString OUT_COLOR = UString(VTEXT("Color"));
-	static const UString DEF_VERT_SHADER = UString(VTEXT("#version ")) + VTEXT("330\n\n\n") +
+	static const std::string UNIFORM_PROJECTION = std::string(VTEXT("gProjection"));
+	static const std::string UNIFORM_SAMPLER = std::string(VTEXT("gSampler"));
+	static const std::string OUT_TEXCOORD = std::string(VTEXT("TexCoord0"));
+	static const std::string OUT_COLOR = std::string(VTEXT("Color"));
+	static const std::string DEF_VERT_SHADER = std::string(VTEXT("#version ")) + VTEXT("330\n\n\n") +
 		VTEXT("layout(location = 0) in vec2 vPosition;\n") +
 		VTEXT("layout(location = 1) in vec4 vColor;\n") +
 		VTEXT("layout(location = 2) in vec2 vTexCoord;\n") +
@@ -57,7 +57,7 @@ namespace Vixen {
 		VTEXT(" * ") + VTEXT("vec4(vPosition, 0.0, 1.0);\n") + OUT_TEXCOORD + VTEXT(" = ") +
 		VTEXT("vTexCoord;\n") + OUT_COLOR + VTEXT(" = ") + VTEXT("vColor;\n") + VTEXT("}\n");
 
-	static const UString DEF_FRAG_SHADER = UString(VTEXT("#version ")) + VTEXT("330\n\n\n") +
+	static const std::string DEF_FRAG_SHADER = std::string(VTEXT("#version ")) + VTEXT("330\n\n\n") +
 		VTEXT("in vec2 ") + OUT_TEXCOORD + VTEXT(";\n") +
 		VTEXT("in vec4 ") + OUT_COLOR + VTEXT(";\n") +
 		VTEXT("uniform sampler2D ") + UNIFORM_SAMPLER + VTEXT(";\n\n") +

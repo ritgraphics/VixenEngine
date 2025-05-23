@@ -291,11 +291,11 @@ namespace Vixen {
 		static const Vector3 Backward;
 
 
-		UString         ToString() const;
+		std::string         ToString() const;
         std::string     ToStdString() const;
 
-		inline VIX_API friend UOStream& operator <<
-			(UOStream& o, const Vector3& v)
+		inline VIX_API friend std::ostream& operator <<
+			(std::ostream& o, const Vector3& v)
 		{
 			o << "Vector3 [ "
 				<< v.ToString()
@@ -306,9 +306,9 @@ namespace Vixen {
 	};
 
 
-	inline UString Vector3::ToString() const
+	inline std::string Vector3::ToString() const
 	{
-		USStream ss;
+		std::stringstream ss;
 		ss <<  std::fixed
 			<< std::setprecision(3)
 			<< "X=" << x << " "

@@ -56,7 +56,7 @@ namespace Vixen {
 		glDeleteShader(m_shader);
 	}
 
-	bool GLShader::VInitFromFile(const UString& path)
+	bool GLShader::VInitFromFile(const std::string& path)
 	{
 		/*grab source from file*/
 		const GLchar* source = ReadShader(path);
@@ -73,7 +73,7 @@ namespace Vixen {
 		return true;
 	}
 
-	bool GLShader::VInitFromString(const UString& path)
+	bool GLShader::VInitFromString(const std::string& path)
 	{
 
 #if defined UNICODE && defined VIX_SYS_WINDOWS
@@ -128,7 +128,7 @@ namespace Vixen {
 #ifdef UNICODE
 			std::string log_text(log);
 			UConverter converter;
-			UString log_string = converter.from_bytes(log_text);
+			std::string log_string = converter.from_bytes(log_text);
 			DebugPrintF(log_string.c_str());
 			std::cout << log << std::endl;
 #else
@@ -144,7 +144,7 @@ namespace Vixen {
 		return true;
 	}
 
-	const GLchar* GLShader::ReadShader(const UString& path)
+	const GLchar* GLShader::ReadShader(const std::string& path)
 	{
 		FILE* file;
 #if defined VIX_SYS_WINDOWS && defined UNICODE

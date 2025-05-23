@@ -161,22 +161,22 @@ namespace Vixen {
 		return m_program;
 	}
 
-	UString Model::GetDiffusePath()
+	std::string Model::GetDiffusePath()
 	{
 		return m_diffusePath;
 	}
 
-	UString Model::GetBumpPath()
+	std::string Model::GetBumpPath()
 	{
 		return m_bumpPath;
 	}
 
-	void Model::SetDiffusePath(UString path)
+	void Model::SetDiffusePath(std::string path)
 	{
 		m_diffusePath = path;
 	}
 
-	void Model::SetBumpPath(UString path)
+	void Model::SetBumpPath(std::string path)
 	{
 		m_bumpPath = path;
 	}
@@ -221,12 +221,12 @@ namespace Vixen {
 		m_program = new GLShaderProgram(args);
 	}
 
-	void Model::InitFromFile(UString filePath, ModelInit initMode)
+	void Model::InitFromFile(std::string filePath, ModelInit initMode)
 	{
 		if(initMode == ModelInit::THREADED) {
 
 			//try initializing in dedicated thread
-			auto func = [](Model* model, UString filePath) {
+			auto func = [](Model* model, std::string filePath) {
 				model->SetTexture(new GLTexture);
 				Model::InitModelThreaded(model, filePath);
 			};
@@ -237,7 +237,7 @@ namespace Vixen {
 			init_model(filePath); //init unthreaded
 	}
 
-	void Model::InitModelThreaded(Model* model, UString filePath)
+	void Model::InitModelThreaded(Model* model, std::string filePath)
 	{
 		std::string _path;
 #if defined(VIX_SYS_WINDOWS) && defined(UNICODE)
@@ -289,12 +289,12 @@ namespace Vixen {
 		}
 
 		if(diffuse.C_Str()) {
-		  UString texPath = Vixen::UStringFromCharArray(diffuse.data);
+		  std::string texPath = Vixen::UStringFromCharArray(diffuse.data);
 		  model->GetTexture()->InitFromFile(texPath);
 		}
 
 		/*if(bump.C_Str()) {
-			UString texPath = cv.from_bytes(bump.data);
+			std::string texPath = cv.from_bytes(bump.data);
 			m_bump = new GLTexture(texPath);
 		}*/
 
@@ -302,7 +302,7 @@ namespace Vixen {
 
 	}
 
-	void Model::init_model(UString filePath)
+	void Model::init_model(std::string filePath)
 	{
 		std::string _path;
 #if defined(VIX_SYS_WINDOWS) && defined(UNICODE)
@@ -353,12 +353,12 @@ namespace Vixen {
 		}
 
 		if(diffuse.C_Str()) {
-		  UString texPath = Vixen::UStringFromCharArray(diffuse.data);
+		  std::string texPath = Vixen::UStringFromCharArray(diffuse.data);
 			m_texture = new GLTexture(texPath);
 		}
 
 		if(bump.C_Str()) {
-		  UString texPath = Vixen::UStringFromCharArray(bump.data);
+		  std::string texPath = Vixen::UStringFromCharArray(bump.data);
 			m_bump = new GLTexture(texPath);
 		}
 

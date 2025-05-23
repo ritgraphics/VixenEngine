@@ -45,10 +45,10 @@ namespace Vixen {
         bool VDeInitialize() override;
 
 		/*Execute Lua script file*/
-		ErrCode VExecuteFile(const UString& path) override;
+		ErrCode VExecuteFile(const std::string& path) override;
 
 		/*Execute Lua expression*/
-		ErrCode VExecuteExpression(const UString& expression) override;
+		ErrCode VExecuteExpression(const std::string& expression) override;
 
 	private:
 		/*report errors in evaluated lua scripts*/

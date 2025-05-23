@@ -62,7 +62,7 @@ namespace Vixen
 
         void VRenderTexture2D(Texture* texture, const Vector2& position, const Rect& source) override;
 
-        void VRenderText2D(Font* font, UString text, const Vector2& position) override;
+        void VRenderText2D(Font* font, std::string text, const Vector2& position) override;
 
         void VResizeBuffers(uint32_t width, uint32_t height) override;
 

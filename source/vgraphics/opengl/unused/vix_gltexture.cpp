@@ -83,7 +83,7 @@ namespace Vixen {
 		m_target = target;
 	}
 
-	GLTexture::GLTexture(const UString& filePath, GLenum target /* = GL_TEXTURE_2D */)
+	GLTexture::GLTexture(const std::string& filePath, GLenum target /* = GL_TEXTURE_2D */)
 	{
 		m_width = 0;
 		m_height = 0;
@@ -129,7 +129,7 @@ namespace Vixen {
 	}
 
 
-	ErrCode GLTexture::InitFromFile(const UString& filePath)
+	ErrCode GLTexture::InitFromFile(const std::string& filePath)
 	{
 		//pointer to image data
 		FREEIMAGE_BMP* image = NULL;

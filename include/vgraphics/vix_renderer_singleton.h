@@ -25,7 +25,7 @@ namespace Vixen
 
         static void SwapBuffers();
 
-        static void Render2DText(Font* font, UString text, const Vector2& position);
+        static void Render2DText(Font* font, std::string text, const Vector2& position);
 
         static void ResizeBuffers(uint32_t width, uint32_t height);
 

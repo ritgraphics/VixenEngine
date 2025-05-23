@@ -27,7 +27,6 @@
 #include <vix_dxquad.h>
 #include <vix_dxmodel.h>
 #include <vix_freeimage.h>
-#include <vix_filemanager.h>
 #include <vix_resourcemanager.h>
 #include <vix_mathfunctions.h>
 #include <iterator>
@@ -68,8 +67,6 @@ namespace Vixen
         //////////////////////////////////////////
         ResourceManager::DecrementAssetRef(m_FinalPassVS.get());
         ResourceManager::DecrementAssetRef(m_FinalPassPS.get());
-
-        
     }
 
     bool DXRenderer::VInitialize()
@@ -233,8 +230,10 @@ namespace Vixen
 
         m_Device->CreateDepthStencilState(&depthStencilDesc, m_lightDSState.put());
 
-        m_pointLightBuffer = std::make_unique<DXLightBuffer>(256, sizeof(PointLight), m_Device.get(), m_ImmediateContext.get());
-        m_spotLightBuffer = std::make_unique<DXLightBuffer>(256, sizeof(SpotLight), m_Device.get(), m_ImmediateContext.get());
+        m_pointLightBuffer =
+            std::make_unique<DXLightBuffer>(256, sizeof(PointLight), m_Device.get(), m_ImmediateContext.get());
+        m_spotLightBuffer =
+            std::make_unique<DXLightBuffer>(256, sizeof(SpotLight), m_Device.get(), m_ImmediateContext.get());
         return true;
     }
 
@@ -243,24 +242,24 @@ namespace Vixen
         m_spriteBatch = std::make_unique<DXSpriteBatcher>(m_Device.get(), m_ImmediateContext.get());
 
         DXVertexShader* vShader =
-            (DXVertexShader*)ResourceManager::OpenShader(VTEXT("SpriteBatch_VS.hlsl"), ShaderType::VERTEX_SHADER);
+            (DXVertexShader*)ResourceManager::OpenShader("SpriteBatch_VS.hlsl", ShaderType::VERTEX_SHADER);
         vShader->IncrementRefCount();
         m_spriteBatch->SetVertexShader(vShader);
 
         DXPixelShader* pShader =
-            (DXPixelShader*)ResourceManager::OpenShader(VTEXT("SpriteBatch_PS.hlsl"), ShaderType::PIXEL_SHADER);
+            (DXPixelShader*)ResourceManager::OpenShader("SpriteBatch_PS.hlsl", ShaderType::PIXEL_SHADER);
         pShader->IncrementRefCount();
         m_spriteBatch->SetPixelShader(pShader);
 
         m_spriteBatch->SetCamera(m_camera2D.get());
 
-        DXVertexShader* finalPassVS = static_cast<DXVertexShader*>(ResourceManager::OpenShader(VTEXT("BackBufferTarget_Deferred_VS.hlsl"),
-            ShaderType::VERTEX_SHADER));
+        DXVertexShader* finalPassVS = static_cast<DXVertexShader*>(
+            ResourceManager::OpenShader("BackBufferTarget_Deferred_VS.hlsl", ShaderType::VERTEX_SHADER));
         m_FinalPassVS.reset(finalPassVS);
         m_FinalPassVS->IncrementRefCount();
 
-        DXPixelShader* finalPassPS = static_cast<DXPixelShader*>(ResourceManager::OpenShader(VTEXT("BackBufferTarget_Deferred_PS.hlsl"),
-            ShaderType::PIXEL_SHADER));
+        DXPixelShader* finalPassPS = static_cast<DXPixelShader*>(
+            ResourceManager::OpenShader("BackBufferTarget_Deferred_PS.hlsl", ShaderType::PIXEL_SHADER));
         m_FinalPassPS.reset(finalPassPS);
         m_FinalPassPS->IncrementRefCount();
     }
@@ -278,7 +277,8 @@ namespace Vixen
         m_DefferedBuffers->ClearRenderTargets(m_ImmediateContext.get(), m_clearColor);
 
         m_ImmediateContext->ClearRenderTargetView(m_RenderTargetView.get(), m_clearColor);
-        m_ImmediateContext->ClearDepthStencilView(m_DepthStencView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+        m_ImmediateContext->ClearDepthStencilView(m_DepthStencView.get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f,
+                                                  0);
     }
 
     void DXRenderer::VAttachNativeHandle(void* handle)
@@ -304,7 +304,6 @@ namespace Vixen
     void DXRenderer::VResizeBuffers(uint32_t width, uint32_t height)
     {
         ReleaseBuffers();
-        m_DefferedBuffers->ReleaseBuffers();
 
         m_SwapChain->ResizeBuffers(1, width, height, m_SwapChainDesc.BufferDesc.Format, 0);
         m_SwapChain->GetDesc(&m_SwapChainDesc);
@@ -504,11 +503,11 @@ namespace Vixen
         //_model->GetMaterial()->GetVertexShader()->VSetShaderResourceView("LightBuffer", m_lightBuffer->GetSRV());
         //_model->GetMaterial()->GetPixelShader()->SetMatrix4x4("invViewProj", ((DXCamera3D*)camera)->InvViewProj());
         //_model->GetMaterial()->GetPixelShader()->VSetShaderResourceView("txDiffuse",
-        //m_DefferedBuffers->GetShaderResourceView(0));
+        // m_DefferedBuffers->GetShaderResourceView(0));
         //_model->GetMaterial()->GetPixelShader()->VSetShaderResourceView("txNormal",
-        //m_DefferedBuffers->GetShaderResourceView(1));
+        // m_DefferedBuffers->GetShaderResourceView(1));
         //_model->GetMaterial()->GetPixelShader()->VSetShaderResourceView("txWorld",
-        //m_DefferedBuffers->GetShaderResourceView(2));
+        // m_DefferedBuffers->GetShaderResourceView(2));
         //_model->GetMaterial()->GetPixelShader()->VSetSamplerState("samLinear", m_FinalPassSS);
         //_model->GetMaterial()->GetPixelShader()->VSetFloat("width", camera->VGetViewport().width);
         //_model->GetMaterial()->GetPixelShader()->VSetFloat("height", camera->VGetViewport().height);
@@ -527,7 +526,7 @@ namespace Vixen
     {
         m_RenderTargetView = nullptr;
         m_DepthStencView = nullptr;
-        m_DefferedBuffers.reset();
+        m_DefferedBuffers->ReleaseBuffers();
     }
 
     void DXRenderer::VBeginDeferred()
@@ -599,7 +598,7 @@ namespace Vixen
         return m_camera2D.get();
     }
 
-    void DXRenderer::VRenderText2D(Font* font, UString text, const Vector2& position)
+    void DXRenderer::VRenderText2D(Font* font, std::string text, const Vector2& position)
     {
 
         m_spriteBatch->Begin(BatchSortMode::IMMEDITATE);
@@ -619,7 +618,7 @@ namespace Vixen
 
         float dx = x;
         float dy = y;
-        for (UChar& c : text)
+        for (char& c : text)
         {
             if (c == '\n')
             {

@@ -14,7 +14,7 @@ namespace Vixen {
 	public:
 		ModelMesh(void);
 
-		void InitFromScene(aiScene* scene, UString fileName);
+		void InitFromScene(aiScene* scene, std::string fileName);
 
 	private:
 		aiMesh*  m_mesh;

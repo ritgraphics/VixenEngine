@@ -48,7 +48,7 @@ namespace Vixen {
 
 	private:
 		SDL_GW_Params m_windowArgs;
-		UString       m_path;
+		std::string       m_path;
 	};
 }
 

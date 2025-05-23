@@ -100,7 +100,7 @@ namespace Vixen {
 #ifdef UNICODE
 			std::string log_text(log);
 			UConverter converter;
-			UString log_string = converter.from_bytes(log_text);
+			std::string log_string = converter.from_bytes(log_text);
 			DebugPrintF(log_string.c_str());
 			std::cout << log << std::endl;
 #else
@@ -116,7 +116,7 @@ namespace Vixen {
 		return true;
 	}
 
-	const GLchar* GLShader::ReadShader(const UString& path)
+	const GLchar* GLShader::ReadShader(const std::string& path)
 	{
 		FILE* file;
 #if defined VIX_SYS_WINDOWS && defined UNICODE

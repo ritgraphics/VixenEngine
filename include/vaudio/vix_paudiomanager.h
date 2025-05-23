@@ -51,7 +51,7 @@ namespace Vixen {
 		~PAudioManager(void);
 
 		void Init();
-		void Load(const UString& file);
+		void Load(const std::string& file);
 		void Term();
 		void Play(size_t index);
 		void Stop();

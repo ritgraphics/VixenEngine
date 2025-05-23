@@ -28,7 +28,6 @@
 #include <vix_dxpixelshader.h>
 #include <vix_dxmodel.h>
 #include <vix_bmfont.h>
-#include <vix_filemanager.h>
 
 namespace Vixen {
 

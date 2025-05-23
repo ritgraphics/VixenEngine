@@ -27,7 +27,7 @@ namespace Vixen {
 
 	int ITexture::uniqueID() const { return m_uniqueID;  }
 
-	UString ITexture::name() const { return m_name;  }
+	std::string ITexture::name() const { return m_name;  }
 
 	
 
